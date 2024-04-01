@@ -1,0 +1,76 @@
+:root {
+    --mainfont: 'Century Gothic', sans-serif;
+    --background: #212623;
+    --text-color: #ffffff;
+    --accent-color: #007bff;
+    --hover-accent-color: #0056b3;
+}
+
+
+header {
+    padding: 20px 0;
+    text-align: center;
+}
+
+header nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: inline-flex;
+    gap: 20px;
+}
+
+header nav ul li a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+header nav ul li a:hover {
+    color: var(--hover-accent-color);
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+#calendar, #feed {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+#calendar h2, #feed h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.calendar-placeholder, .feed-item {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    color: #212623;
+}
+
+/* Adjustments to ensure consistency with the existing styles */
+.login-container, #calendar, #feed {
+    width: auto;
+    max-width: 600px; /* Adjust based on your layout preference */
+    margin: 0 auto; /* Center aligning the container */
+}
+
+/* Additional styles for responsiveness and beautification */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    main {
+        flex-direction: column;
+    }
+}
