@@ -1,0 +1,17 @@
+1. Create a login page
+2. Create a sign up page
+3. Create main landing page: shows all events
+4. research showing data from events.ucf
+5. Add additional info for different users
+   a. Super admin: create profile for university
+   Name, location, num students, pictures, etc
+   b. Admin: create events, owns an RSO with a university
+   c. Student: can join RSOs, attend events
+6. Event page: shows all info about event
+   name, event category, description, time, date, location, contact phone, and contact email address. Location set from map (api?)
+   Event types:
+   a. public: seen by everyone
+   b. private: seen by university members
+   c. rso: seen by members of the RSO
+
+Events are approved by super admin
