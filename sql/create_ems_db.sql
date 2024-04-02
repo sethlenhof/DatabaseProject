@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS Users;
 DROP USER IF EXISTS 'dev'@'localhost';
 
 -- create dev user
-CREATE USER 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Password1!';
+CREATE USER 'dev'@'localhost' IDENTIFIED BY 'Password1!';
 
 -- grant dev user permissions
 GRANT ALL PRIVILEGES ON event_management_system.* TO 'dev'@'localhost';
