@@ -1,6 +1,6 @@
 -- this is NOT made by gpt and WILL be used
 
-create database event_management_system;
+CREATE DATABASE event_management_system;
 use event_management_system;
 
 
