@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS RSOs;
 DROP TABLE IF EXISTS Universities;
 DROP TABLE IF EXISTS UserUserTypes;
 DROP TABLE IF EXISTS UserTypes;
-DROP TABLE IF EXISTS UserAuth;
+DROP TABLE IF EXISTS UserLogin;
 DROP TABLE IF EXISTS Users;
 
 -- drop the users
@@ -38,7 +38,7 @@ CREATE TABLE Users (
 );
 
 -- User Authentication Table (for storing hashed passwords and login info)
-CREATE TABLE UserAuth (
+CREATE TABLE UserLogin (
     user_id INT PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
     last_login TIMESTAMP NULL,

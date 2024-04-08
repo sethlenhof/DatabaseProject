@@ -6,7 +6,6 @@ require 'db.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Simulate data retrieval
     $data = ['message' => 'Hello, World!'];
     echo json_encode($data);
 } else {
