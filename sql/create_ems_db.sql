@@ -1,5 +1,6 @@
 -- this is NOT made by gpt and WILL be used
 
+DROP DATABASE IF EXISTS event_management_system;
 CREATE DATABASE event_management_system;
 use event_management_system;
 
@@ -22,7 +23,10 @@ DROP TABLE IF EXISTS Users;
 DROP USER IF EXISTS 'dev'@'localhost';
 
 -- create dev user
-CREATE USER 'dev'@'localhost' IDENTIFIED BY 'Password1!';
+-- CREATE USER 'dev'@'localhost' IDENTIFIED BY 'Password1!';
+-- create if using js
+CREATE USER 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Password1!';
+-- CREATE USER 'dev'@'localhost' IDENTIFIED BY 'Password1!';
 
 -- grant dev user permissions
 GRANT ALL PRIVILEGES ON event_management_system.* TO 'dev'@'localhost';
