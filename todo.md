@@ -1,5 +1,7 @@
-- [ ] 1. Create a login page
-- [ ] 2. Create a sign up page
+- [x] 1. Create a login page
+   - [ ] add login button functionality 
+- [x] 2. Create a sign up page
+   - [ ] add sign up button functionality
 - [ ] 3. Create main landing page: shows all events
 - [ ] 4. Research showing data from events.ucf
 - [ ] 5. Add additional info for different users
