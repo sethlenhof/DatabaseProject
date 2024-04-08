@@ -12,12 +12,14 @@ app.listen(port, () => {
 });
 
 app.get("/", (req, res) => {
+    res.send('API is working!');
+});
+
+app.get("/showTables", (req, res) => {
     db.query('SHOW TABLES;', (err, results) => {
         if (err) {
-            res.status(500).send(err);
+            res.status
         }
         res.status(200).send(results);
     });
-    console.log('GET request received');
 });
-
