@@ -17,12 +17,17 @@ export default class Strings {
 	static EmailInvalidError() {
 		return "Please enter a valid email address.";
 	}
+	static PassDoNotMatch(){
+		return "Passwords do not match"
+	}
 	static SignupErrorMessage(errorMessage) {
 		switch (errorMessage) {
 			case "duplicateEmail":
 				return "Email already exists";
 			case "invalidPass":
 				return "Password must contain more than 8 characters";
+			case "passDoNotMatch":
+				return "Passwords do not match"
 			case "invalidEmail":
 				return "Invalid Email";
 			case "missingFields":

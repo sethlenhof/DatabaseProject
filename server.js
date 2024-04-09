@@ -11,11 +11,11 @@ app.listen(port, () => {
 	console.log(`Express server listening at http://localhost:${port}`);
 });
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
     res.send('API is working!');
 });
 
-app.get("/showTables", (req, res) => {
+app.get("/api/showTables", (req, res) => {
     db.query('SHOW TABLES;', (err, results) => {
         if (err) {
             res.status
