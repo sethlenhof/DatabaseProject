@@ -1,113 +1,163 @@
--- this is NOT made by gpt and WILL be used
-
 DROP DATABASE IF EXISTS event_management_system;
 CREATE DATABASE event_management_system;
-use event_management_system;
+USE event_management_system;
 
-
--- if the tables exist delete them
-DROP TABLE IF EXISTS User_Login;
-DROP TABLE IF EXISTS University; 
+-- Dropping tables in reverse order due to foreign key constraints
+DROP TABLE IF EXISTS COMMENT;
+DROP TABLE IF EXISTS APPROVED_EVENTS;
+DROP TABLE IF EXISTS EVENTS;
+DROP TABLE IF EXISTS SUPER_ADMIN;
+DROP TABLE IF EXISTS RSO_ADMIN;
+DROP TABLE IF EXISTS STUDENT;
+DROP TABLE IF EXISTS USER_INFO;
 DROP TABLE IF EXISTS RSO;
-DROP TABLE IF EXISTS User;
-DROP TABLE IF EXISTS Student;
-DROP TABLE IF EXISTS RAdmin; -- Admin is a reserved word
-DROP TABLE IF EXISTS SAdmin;
-DROP TABLE IF EXISTS Events; -- Event is a reserved word
-DROP TABLE IF EXISTS Approved_Events;
-DROP TABLE IF EXISTS Comment;
+DROP TABLE IF EXISTS UNIVERSITY;
+DROP TABLE IF EXISTS USER_LOGIN;
 
--- drop the users
 DROP USER IF EXISTS 'dev'@'localhost';
 
 -- create dev user
 -- CREATE USER 'dev'@'localhost' IDENTIFIED BY 'Password1!';
 -- create if using js
 CREATE USER 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Password1!';
--- CREATE USER 'dev'@'localhost' IDENTIFIED BY 'Password1!';
 
 -- grant dev user permissions
 GRANT ALL PRIVILEGES ON event_management_system.* TO 'dev'@'localhost';
 
--- flush privileges
 FLUSH PRIVILEGES;
 
--- Create User_Login table
-CREATE TABLE User_Login {
-    user_id INT,
-    email VARCHAR(255),
-    password VARCHAR(255)
-}
--- Create University table
-CREATE TABLE University {
-    university_id INT,
-    name VARCHAR(255),
-    location VARCHAR(255),
-    description TEXT
-    num_of_students INT
-}
+CREATE TABLE USER_LOGIN (
+    USER_ID INT AUTO_INCREMENT PRIMARY KEY,
+    EMAIL VARCHAR(255) NOT NULL UNIQUE,
+    PASS VARCHAR(255) NOT NULL
+);
 
--- Create RSO table
-CREATE TABLE RSO {
-    rso_id INT, 
-    name VARCHAR(255),
-    description TEXT
-}
+CREATE TABLE UNIVERSITY (
+    UNIVERSITY_ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255),
+    LOCATION VARCHAR(255),
+    DESCRIPTION TEXT,
+    NUM_OF_STUDENTS INT
+);
 
--- Create User table
-CREATE TABLE User {
-    user_id INT,
-    name VARCHAR(255),
-    university_id INT,
-    foreign key (university_id) references University(university_id)
-    foreign key (user_id) references User_Login(user_id)
-}
+CREATE TABLE RSO (
+    RSO_ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255),
+    DESCRIPTION TEXT
+);
 
--- Create Student table
-CREATE TABLE Student {
-    rso_id INT,
-    user_id INT,
-    foreign key (user_id) references User(user_id)
-    foreign key (rso_id) references RSO(rso_id)
-}
+CREATE TABLE USER_INFO (
+    USER_ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255),
+    UNIVERSITY_ID INT,
+    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
+);
 
--- Create RAdmin table
-CREATE TABLE RAdmin {
-    user_id INT,
-    rso_id INT,
-    foreign key (user_id) references User(user_id)
-    foreign key (rso_id) references RSO(rso_id)
-}
+CREATE TABLE STUDENT (
+    RSO_ID INT,
+    USER_ID INT,
+    PRIMARY KEY (RSO_ID, USER_ID),
+    FOREIGN KEY (USER_ID) REFERENCES USER_INFO(USER_ID),
+    FOREIGN KEY (RSO_ID) REFERENCES RSO(RSO_ID)
+);
 
--- Create SAdmin table
-CREATE TABLE SAdmin {
-    user_id INT,
-    university_id INT,
-    foreign key (user_id) references User(user_id)
-    foreign key (university_id) references University(university_id)
-}
+CREATE TABLE RSO_ADMIN (
+    USER_ID INT,
+    RSO_ID INT,
+    PRIMARY KEY (USER_ID, RSO_ID),
+    FOREIGN KEY (USER_ID) REFERENCES USER_INFO(USER_ID),
+    FOREIGN KEY (RSO_ID) REFERENCES RSO(RSO_ID)
+);
 
--- Create Events table
-CREATE TABLE Events {
-    event_id INT,
-    rso_id INT,
-    university_id INT
-}
+CREATE TABLE SUPER_ADMIN (
+    USER_ID INT,
+    UNIVERSITY_ID INT,
+    PRIMARY KEY (USER_ID, UNIVERSITY_ID),
+    FOREIGN KEY (USER_ID) REFERENCES USER_INFO(USER_ID),
+    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
+);
 
--- Create Approved_Events table
-CREATE TABLE Approved_Events {
-    event_id INT,
-    SAdmin_id INT
-}
+CREATE TABLE EVENTS (
+    EVENT_ID INT AUTO_INCREMENT PRIMARY KEY,
+    RSO_ID INT,
+    UNIVERSITY_ID INT,
+    FOREIGN KEY (RSO_ID) REFERENCES RSO(RSO_ID),
+    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
+);
 
--- Create Comment table
-CREATE TABLE Comment {
-    comment_id INT,
-    event_id INT,
-    user_id INT,
-    comment TEXT,
-    rating INT,
-    foreign key (event_id) references Events(event_id)
-    foreign key (user_id) references User(user_id)
-}
+CREATE TABLE APPROVED_EVENTS (
+    EVENT_ID INT,
+    SUPER_ADMIN_ID INT,
+    PRIMARY KEY (EVENT_ID, SUPER_ADMIN_ID),
+    FOREIGN KEY (EVENT_ID) REFERENCES EVENTS(EVENT_ID),
+    FOREIGN KEY (SUPER_ADMIN_ID) REFERENCES SUPER_ADMIN(USER_ID)
+);
 
+CREATE TABLE COMMENT (
+    COMMENT_ID INT AUTO_INCREMENT PRIMARY KEY,
+    EVENT_ID INT,
+    USER_ID INT,
+    COMMENT TEXT,
+    RATING INT,
+    FOREIGN KEY (EVENT_ID) REFERENCES EVENTS(EVENT_ID),
+    FOREIGN KEY (USER_ID) REFERENCES USER_INFO(USER_ID)
+);
+
+
+DELIMITER //
+-- INSERT USER_LOGIN
+CREATE PROCEDURE insert_user_login(IN input_email VARCHAR(255), IN input_pass VARCHAR(255))
+BEGIN
+    -- Check if the email already exists
+    DECLARE emailExists INT;
+    DECLARE passLength INT;
+    
+    -- Create a temporary table for response
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+    
+    SELECT COUNT(*) INTO emailExists FROM USER_LOGIN WHERE EMAIL = input_email;
+    SELECT LENGTH(input_pass) INTO passLength;
+
+    -- Insert the new user only if the email does not exist
+    IF emailExists > 0 THEN
+        INSERT INTO RESPONSE VALUES ('Error', 'duplicateEmail');
+    ELSEIF passLength < 8 THEN
+        INSERT INTO RESPONSE VALUES ('Error', 'invalidPass');
+    ELSE
+        -- Insert the new user if the email does not exist
+        INSERT INTO USER_LOGIN (EMAIL, PASS) VALUES (input_email, SHA2(input_pass, 256));
+        INSERT INTO RESPONSE VALUES ('Success', 'User added');
+    END IF;
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE RESPONSE;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE validate_user(IN input_email VARCHAR(255), IN input_pass VARCHAR(255))
+BEGIN
+    -- logic variables
+    DECLARE isValid INT DEFAULT 0;
+    DECLARE userID INT;
+
+    -- Create a temporary table for response
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+    -- check if user exists
+    SELECT COUNT(*) INTO isValid FROM USER_LOGIN WHERE EMAIL = input_email AND PASS = SHA2(input_pass, 256);
+    IF isValid = 0 THEN
+        INSERT INTO RESPONSE VALUES ('Error', 'invalidCredentials');
+    ELSE
+        SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = input_email AND PASS = SHA2(input_pass, 256);
+        INSERT INTO RESPONSE VALUES ('Success', userID);
+    END IF;
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE RESPONSE;
+END //
+DELIMITER ;
