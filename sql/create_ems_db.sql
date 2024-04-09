@@ -33,13 +33,81 @@ GRANT ALL PRIVILEGES ON event_management_system.* TO 'dev'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Create User_Login table
-
+CREATE TABLE User_Login {
+    user_id INT,
+    email VARCHAR(255),
+    password VARCHAR(255)
+}
 -- Create University table
+CREATE TABLE University {
+    university_id INT,
+    name VARCHAR(255),
+    location VARCHAR(255),
+    description TEXT
+    num_of_students INT
+}
+
 -- Create RSO table
+CREATE TABLE RSO {
+    rso_id INT, 
+    name VARCHAR(255),
+    description TEXT
+}
+
 -- Create User table
+CREATE TABLE User {
+    user_id INT,
+    name VARCHAR(255),
+    university_id INT,
+    foreign key (university_id) references University(university_id)
+    foreign key (user_id) references User_Login(user_id)
+}
+
 -- Create Student table
+CREATE TABLE Student {
+    rso_id INT,
+    user_id INT,
+    foreign key (user_id) references User(user_id)
+    foreign key (rso_id) references RSO(rso_id)
+}
+
 -- Create RAdmin table
+CREATE TABLE RAdmin {
+    user_id INT,
+    rso_id INT,
+    foreign key (user_id) references User(user_id)
+    foreign key (rso_id) references RSO(rso_id)
+}
+
 -- Create SAdmin table
+CREATE TABLE SAdmin {
+    user_id INT,
+    university_id INT,
+    foreign key (user_id) references User(user_id)
+    foreign key (university_id) references University(university_id)
+}
+
 -- Create Events table
+CREATE TABLE Events {
+    event_id INT,
+    rso_id INT,
+    university_id INT
+}
+
 -- Create Approved_Events table
+CREATE TABLE Approved_Events {
+    event_id INT,
+    SAdmin_id INT
+}
+
 -- Create Comment table
+CREATE TABLE Comment {
+    comment_id INT,
+    event_id INT,
+    user_id INT,
+    comment TEXT,
+    rating INT,
+    foreign key (event_id) references Events(event_id)
+    foreign key (user_id) references User(user_id)
+}
+
