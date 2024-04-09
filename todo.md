@@ -31,3 +31,14 @@ Components needed:
 - [ ] 8. Event Approval Component
 - [ ] 9. Create event Component
 - [ ] 10. Create RSO Component
+
+Queries needed:
+
+- [ ] 1. Events for a User
+  - [ ] a. Public
+  - [ ] b. Private
+  - [ ] c. RSO
+  - [ ] d. All
+- [ ] 2. Queries for an Event
+  - [ ] a. Ratings
+  - [ ] b. Comments
