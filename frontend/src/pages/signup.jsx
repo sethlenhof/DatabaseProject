@@ -72,7 +72,7 @@ export default class Signup extends React.Component {
 			else{
 				window.showToast({title: "Error", message: "Sign Up failed", type: "error", autoHide: true});
 			}
-        });		
+        });
     }
 
     setErrorMessage(message) {

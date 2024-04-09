@@ -18,7 +18,6 @@ const Toast = ({ id, title, message, type, onClose, autoHide, style }) => {
     useEffect(() => {
         let fadeOutTimer;
         if (!visible) {
-            // Wait for fade out transition to complete before removing the toast
             fadeOutTimer = setTimeout(() => onClose(id), 1000); // Match the transition time
         }
         return () => clearTimeout(fadeOutTimer);
@@ -47,7 +46,7 @@ const Toast = ({ id, title, message, type, onClose, autoHide, style }) => {
 
     return (
         <div style={toastStyle}>
-            <div style={{ marginRight: '20px' }}>
+            <div style={{ marginRight: '10px' }}>
                 {type === 'success' ? <span>&#10003;</span> : <span>&#10060;</span>}
             </div>
             <div>
