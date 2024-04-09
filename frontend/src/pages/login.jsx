@@ -78,6 +78,7 @@ export default class Login extends React.Component {
 						errorMessage: Strings.LoginErrorMessage(data.error),
 					});
 				});
+				window.showToast({title: "Error", message: "Login failed", type: "error", autoHide: true});
 			}
 		});
 	}
