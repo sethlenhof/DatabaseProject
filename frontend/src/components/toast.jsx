@@ -1,31 +1,32 @@
 import React, { useEffect, useState } from 'react';
 
-const Toast = ({ title, message, type, onClose, autoHide, style }) => {
-    const [visible, setVisible] = useState(true);
+let lastToastId = 0; // Guarantees toast ID uniqueness
+
+const Toast = ({ id, title, message, type, onClose, autoHide, style }) => {
+    const [visible, setVisible] = useState(true); // Track visibility for fading
 
     useEffect(() => {
+        let timer;
         if (autoHide) {
-            const timer = setTimeout(() => {
-                setVisible(false); // Trigger the fade out
+            timer = setTimeout(() => {
+                setVisible(false); // Initiate fade out by changing visibility
             }, 5000); // Time before starting the fade-out process
-            return () => clearTimeout(timer);
         }
+        return () => clearTimeout(timer);
     }, [autoHide]);
 
     useEffect(() => {
+        let fadeOutTimer;
         if (!visible) {
-            const fadeOutTimer = setTimeout(onClose, 1000); // Adjust to 1s to match the fade-out transition time
-            return () => clearTimeout(fadeOutTimer);
+            // Wait for fade out transition to complete before removing the toast
+            fadeOutTimer = setTimeout(() => onClose(id), 1000); // Match the transition time
         }
-    }, [visible, onClose]);
+        return () => clearTimeout(fadeOutTimer);
+    }, [visible, onClose, id]);
 
-    const handleCloseInstantly = () => {
-        onClose();
-    };
-
-    const baseToastStyle = {
-        transition: 'opacity 1s', // Match with fadeOutTimer
-        opacity: visible ? 1 : 0,
+    const toastStyle = {
+        transition: 'opacity 1s',
+        opacity: visible  ? 1 : 0,
         minWidth: '250px',
         margin: '0.5rem',
         padding: '10px',
@@ -34,17 +35,9 @@ const Toast = ({ title, message, type, onClose, autoHide, style }) => {
         alignItems: 'center',
         boxShadow: '0 0 10px rgba(0,0,0,0.1)',
         zIndex: 1000,
-    };
-
-    const toastStyle = {
-        ...baseToastStyle,
         backgroundColor: type === 'success' ? '#dff0d8' : '#e8817c',
         color: type === 'success' ? '#3c763d' : '#891d18',
         ...style,
-    };
-
-    const iconStyle = {
-        marginRight: '20px',
     };
 
     const closeButtonStyle = {
@@ -54,15 +47,15 @@ const Toast = ({ title, message, type, onClose, autoHide, style }) => {
 
     return (
         <div style={toastStyle}>
-            <div style={iconStyle}>
-            {type === 'success' ? <span>&#10003;</span> : <span>&#10060;</span>}
+            <div style={{ marginRight: '20px' }}>
+                {type === 'success' ? <span>&#10003;</span> : <span>&#10060;</span>}
             </div>
             <div>
                 <div style={{ fontWeight: 'bold' }}>{title}</div>
                 <div>{message}</div>
             </div>
-            <div style={closeButtonStyle} onClick={() => handleCloseInstantly()}>
-                    &#10006;
+            <div style={closeButtonStyle} onClick={() => onClose(id)}>
+                &#10006;
             </div>
         </div>
     );
@@ -71,32 +64,33 @@ const Toast = ({ title, message, type, onClose, autoHide, style }) => {
 const ToastContainer = () => {
     const [toasts, setToasts] = useState([]);
 
-    const addToast = (toast) => setToasts(currentToasts => [{ ...toast, id: Date.now() }, ...currentToasts]);
-    const removeToast = (id) => setToasts(currentToasts => currentToasts.filter(toast => toast.id !== id));
-
-    useEffect(() => {
-        window.showToast = addToast;
-    }, []);
-
-    // Container style for proper positioning
-    const containerStyle = {
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
+    const addToast = (toast) => {
+        const id = ++lastToastId; // Increment before use to ensure it starts from 1
+        setToasts(currentToasts => [{ ...toast, id }, ...currentToasts]);
     };
 
+    const removeToast = (id) => {
+        setToasts(currentToasts => currentToasts.filter(toast => toast.id !== id));
+    };
+
+    useEffect(() => {
+        window.showToast = ({ title, message, type, autoHide }) => 
+            addToast({ title, message, type, autoHide });
+    }, []);
+
     return (
-        <div style={containerStyle}>
+        <div style={{ position: 'fixed', top: '20px', right: '20px' }}>
             {toasts.map((toast, index) => (
                 <Toast
                     key={toast.id}
+                    id={toast.id}
                     title={toast.title}
                     message={toast.message}
                     type={toast.type}
                     autoHide={toast.autoHide}
-                    onClose={() => removeToast(toast.id)}
+                    onClose={removeToast}
                     style={{
-                        top: `${index * 70}px`, // Calculate vertical position
+                        top: `${index * 70}px`, // Adjust if necessary based on your toast height
                     }}
                 />
             ))}

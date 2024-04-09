@@ -9,10 +9,10 @@ export default class Signup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: "",
-            password: "",
-            confirmPassword: "", // Add state for the second password
-            errorMessage: "",
+            email: "test@testing.com",
+            password: "password123",
+            confirmPassword: "password123",
+			errorMessage: "",
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -59,19 +59,20 @@ export default class Signup extends React.Component {
                     console.log("Sign up successful!");
 					window.showToast({
 						title: "Success",
-						message: "Your operation was successful!",
+						message: "Sign Up Success!",
 						type: "success",
 						autoHide: true,
 					  });
-					  
-
                 });
             } else if (data.status === 400) {
                 data.json().then((data) => {
                     this.setErrorMessage(Strings.SignupErrorMessage(data.error));
                 });
             }
-        });
+			else{
+				window.showToast({title: "Error", message: "Sign Up failed", type: "error", autoHide: true});
+			}
+        });		
     }
 
     setErrorMessage(message) {
