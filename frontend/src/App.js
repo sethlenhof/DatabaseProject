@@ -4,6 +4,7 @@ import Login from "./pages/login.jsx";
 import Signup from "./pages/signup.jsx";
 import Background from "./components/background.jsx";
 import Landing from "./pages/landing.jsx";
+import ToastContainer from "./components/toast.jsx";
 
 export default function App() {
 	return (
@@ -13,6 +14,7 @@ export default function App() {
 				margin: "0",
 			}}>
       <Background/>
+	  <ToastContainer />
 			<Router>
 				<Routes>
 					<Route path="/" element={<Login />}></Route>

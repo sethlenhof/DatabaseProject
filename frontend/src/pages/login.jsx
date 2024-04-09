@@ -39,7 +39,7 @@ export default class Login extends React.Component {
 			this.setState({
 				invalidEmail: this.state.email === "",
 				invalidPassword: this.state.password === "",
-				errorMessage: "missingFields",
+				errorMessage: Strings.LoginErrorMessage("missingFields"),
 			});
 			return;
 		} else {
@@ -75,9 +75,10 @@ export default class Login extends React.Component {
 				console.log("Login failed");
 				data.json().then((data) => {
 					this.setState({
-						errorMessage: data.error,
+						errorMessage: Strings.LoginErrorMessage(data.error),
 					});
 				});
+				window.showToast({title: "Error", message: "Login failed", type: "error", autoHide: true});
 			}
 		});
 	}
