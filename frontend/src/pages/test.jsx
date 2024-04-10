@@ -1,5 +1,7 @@
 import React from 'react';
 import Calendar from '../components/calendar';
+import MyCalendar from '../components/calendar2';
+
 
 export default class Test extends React.Component {
     // Define your events array
@@ -11,7 +13,8 @@ export default class Test extends React.Component {
     render() {
         return (
             <div>
-                <Calendar events={this.events} />
+                {/* <Calendar events={this.events} /> */}
+                <MyCalendar />
             </div>
         );
     }
