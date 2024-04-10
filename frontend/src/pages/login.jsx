@@ -65,8 +65,8 @@ export default class Login extends React.Component {
 				console.log("Login successful");
 				data.json().then((data) => {
 					console.log(data);
-					localStorage.setItem("token", data.TOKEN);
-					localStorage.setItem("user", JSON.stringify(data.user));
+					localStorage.setItem("user", data);
+					// localStorage.setItem("user", JSON.stringify(data.user));
 					console.log(data.TOKEN);
                     window.location.href = "/landing";
 				});
