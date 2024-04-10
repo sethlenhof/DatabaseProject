@@ -2,10 +2,6 @@ import React from 'react';
 import Colors from '../constants/colors.jsx';
 
 export default class ErrorMessage extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div
