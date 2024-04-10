@@ -34,11 +34,11 @@ Components needed:
 
 Queries needed:
 
-- [ ] 1. Events for a User
-  - [ ] a. Public
-  - [ ] b. Private
-  - [ ] c. RSO
-  - [ ] d. All
+- [x] 1. Events for a User
+  - [x] a. Public
+  - [x] b. Private
+  - [x] c. RSO
+  - [x] d. All
 - [ ] 2. Queries for an Event
   - [ ] a. Ratings
   - [ ] b. Comments
