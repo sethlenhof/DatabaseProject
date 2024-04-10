@@ -5,7 +5,6 @@ import listPlugin from '@fullcalendar/list';
 export default function Calendar({ events }) {
     return (
         <>
-        // Render the calendar
         <FullCalendar
             plugins={[dayGridPlugin]}
             initialView="dayGridMonth"
