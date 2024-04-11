@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // Assuming you're using react-router for navigation
 
-const ButtonCluster = ({ user }) => {
+const NavCluster = ({ user }) => {
     const buttonClusterStyle = {
         position: 'relative',
         top: '20px',
@@ -55,4 +55,4 @@ const ButtonCluster = ({ user }) => {
     );
 };
 
-export default ButtonCluster;
+export default NavCluster;
