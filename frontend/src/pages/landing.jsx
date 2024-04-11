@@ -1,5 +1,5 @@
 import React from 'react';
-import Calendar from '../components/calendar';
+import MyCalendar from '../components/calendar';
 
 export default class Landing extends React.Component {
     // Define your events array
@@ -11,10 +11,7 @@ export default class Landing extends React.Component {
     render() {
         return (
             <div>
-                <Calendar events={this.events} /> {/* Use this.events to access the events array */}
-                <div>
-                    <h1>Hello, World!</h1>
-                </div>
+                <MyCalendar events={this.events} /> {/* Use this.events to access the events array */}
             </div>
         );
     }

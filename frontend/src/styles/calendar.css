@@ -1,9 +1,9 @@
 
 .fc { /* the calendar root */
-    max-width: 1100px;
+    flex: fit-content;
     margin: 0 auto;
     background-color: white;
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 24px 24px 24px rgba(0, 0, 0, 0.1);
   }

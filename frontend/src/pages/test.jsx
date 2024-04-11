@@ -1,12 +1,12 @@
 import React from 'react';
-import Calendar from '../components/calendar';
-import MyCalendar from '../components/calendar2';
+import MyCalendar from '../components/calendar.jsx';
+import ListView from '../components/listView.jsx';
 
 
 export default class Test extends React.Component {
     // Define your events array
     events=[
-        { title: 'Fucking pistachio', date: '2024-04-01' },
+        { title: 'Fucking pistachio', date: '2024-04-10' },
         // { title: 'event 2', date: '2024-04-02' },
         {title: 'Goon',
             start: '2024-04-10T10:00:00', // Specify the start time
@@ -41,10 +41,14 @@ export default class Test extends React.Component {
 
     render() {
         return (
-            <div>
-                {/* <Calendar events={this.events} /> */}
+            <>
+            <div style={{height:'80vh', width: '45vw', alignContent:'center', position: 'fixed', top:'100px', left: '20px'}}>
                 <MyCalendar events={this.events}/>
             </div>
+            <div style={{height:'80vh', width: '45vw', alignContent:'center', position: 'fixed', top:'100px', right: '20px'}}>
+                <ListView events={this.events}/>
+            </div>
+            </>
         );
     }
 }
