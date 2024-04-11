@@ -1,6 +1,6 @@
 import React from 'react';
 import MyCalendar from '../components/calendar';
-
+import NavCluster from '../components/navCluster';
 
 export default class Landing extends React.Component {
     // Define your events array
@@ -12,9 +12,18 @@ export default class Landing extends React.Component {
 
     render() {
         return (
-            <div>
-                <h1>Home</h1>
-            </div>
+            <>
+                <NavCluster user={{role: 'admin'}} />
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100vh'
+                    }}>
+                    <h1>Calendar Stuff</h1>
+                </div>
+            </>
         );
     }
 }
