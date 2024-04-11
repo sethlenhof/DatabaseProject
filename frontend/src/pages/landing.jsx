@@ -1,17 +1,19 @@
 import React from 'react';
 import MyCalendar from '../components/calendar';
 
+
 export default class Landing extends React.Component {
     // Define your events array
     events=[
-        { title: 'event 1', date: '2024-04-01' },
-        { title: 'event 2', date: '2024-04-02' }
+        // ways to format the data
+        {title: 'Goon', start: '2024-04-10T10:00:00', end: '2024-04-10T12:00:00', color: '#ff9f89'},
+        {title: 'test day', date: '2024-04-13', color: '#ff9f89'},
     ]
 
     render() {
         return (
             <div>
-                <MyCalendar events={this.events} /> {/* Use this.events to access the events array */}
+                <h1>Home</h1>
             </div>
         );
     }
