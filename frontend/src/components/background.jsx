@@ -6,7 +6,6 @@ class Background extends React.Component {
   componentDidMount() {
     this.updateCanvasSize();
     window.addEventListener("resize", this.updateCanvasSize);
-    this.animate();
   }
 
   componentWillUnmount() {
@@ -29,30 +28,6 @@ class Background extends React.Component {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
   };
-
-  animate = () => {
-    requestAnimationFrame(this.animate);
-    const ctx = this.canvasRef.current.getContext("2d");
-    this.drawBackground(); // Redraw the background to avoid trails
-
-    // Lines properties
-    const linesCount = 100;
-    const linesColor = "rgba(255,255,255,0.2)";
-    const maxLineHeight = 15;
-    const lineHeightVariance = Math.random() * maxLineHeight;
-
-    // Draw moving lines
-    for (let i = 0; i < linesCount; i++) {
-      const x = Math.random() * window.innerWidth;
-      const y = Math.random() * window.innerHeight;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + lineHeightVariance, y + lineHeightVariance);
-      ctx.strokeStyle = linesColor;
-      ctx.stroke();
-    }
-  };
-
   render() {
     return (
       <canvas
