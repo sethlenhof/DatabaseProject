@@ -1,61 +1,51 @@
-USE event_management_system;
+use event_management_system;
+-- Populate the UNIVERSITY Table
+INSERT INTO UNIVERSITY (NAME, LOCATION, DESCRIPTION, NUM_OF_STUDENTS) 
+VALUES 
+('Tech University', 'Tech City', 'A university focused on technology and innovation.', 15000),
+('Art University', 'Art City', 'A university dedicated to art and design.', 8000);
 
--- Inserting sample universities
-INSERT INTO UNIVERSITY (NAME, LOCATION, DESCRIPTION, NUM_OF_STUDENTS) VALUES 
-('Tech University', 'Tech City', 'A leading university in technology.', 10000),
-('Humanities University', 'Humanities City', 'A leading university in humanities.', 8000);
+-- Populate the RSO Table
+INSERT INTO RSO (NAME, DESCRIPTION) 
+VALUES 
+('Tech Club', 'A club for students interested in technology.'),
+('Art Society', 'A society for students interested in arts.');
 
--- Inserting sample RSOs
-INSERT INTO RSO (NAME, DESCRIPTION) VALUES 
-('Tech Club', 'A club for tech enthusiasts.'),
-('Literature Society', 'A society for lovers of literature.');
+-- Create users and populate USER_LOGIN and USER_INFO
+CALL insert_user_login('techuser@techuniversity.com', 'TechPass123');
+CALL insert_user_login('artuser@artuniversity.com', 'ArtPass123');
 
--- Inserting sample users
-INSERT INTO USER_LOGIN (EMAIL, PASS) VALUES 
-('john.doe@example.com', SHA2('password123', 256)),
-('jane.smith@example.com', SHA2('password456', 256));
+-- Assuming the procedure `insert_user_login` does not actually populate USER_INFO
+-- Populate the USER_INFO Table manually if needed
+UPDATE USER_INFO SET NAME = 'Tech User', UNIVERSITY_ID = 1 WHERE USER_ID = (SELECT USER_ID FROM USER_LOGIN WHERE EMAIL = 'techuser@techuniversity.com');
+UPDATE USER_INFO SET NAME = 'Art User', UNIVERSITY_ID = 2 WHERE USER_ID = (SELECT USER_ID FROM USER_LOGIN WHERE EMAIL = 'artuser@artuniversity.com');
 
-INSERT INTO USER_INFO (NAME, UNIVERSITY_ID) VALUES 
-('John Doe', 1),
-('Jane Smith', 2);
+-- Populate STUDENT Table linking users to RSOs
+INSERT INTO STUDENT (RSO_ID, USER_ID) 
+VALUES 
+(1, (SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'techuser@techuniversity.com')),
+(2, (SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'artuser@artuniversity.com'));
 
--- Assigning users to RSOs and roles
-INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES 
-(1, 1),
-(2, 2);
+-- Populate the EVENTS Table with RSO events, private university events, and public events
+INSERT INTO EVENTS (RSO_ID, UNIVERSITY_ID) 
+VALUES 
+(1, 1),  -- RSO event at Tech University
+(2, 2),  -- RSO event at Art University
+(NULL, 1),  -- Private event at Tech University
+(NULL, NULL);  -- Public event
 
-INSERT INTO RSO_ADMIN (USER_ID, RSO_ID) VALUES 
-(1, 1),
-(2, 2);
+-- Populate the APPROVED_EVENTS Table to ensure some events are approved
+INSERT INTO APPROVED_EVENTS (EVENT_ID, SUPER_ADMIN_ID) 
+VALUES 
+(1, (SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'techuser@techuniversity.com')),
+(2, (SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'artuser@artuniversity.com'));
 
-INSERT INTO SUPER_ADMIN (USER_ID, UNIVERSITY_ID) VALUES 
-(1, 1),
-(2, 2);
+-- Populate the COMMENT Table with some comments for events
+INSERT INTO COMMENT (EVENT_ID, USER_ID, COMMENT, RATING) 
+VALUES 
+(1, (SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'techuser@techuniversity.com'), 'Very informative session!', 5),
+(2, (SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'artuser@artuniversity.com'), 'Inspiring art workshop!', 4);
 
--- Inserting sample events
--- Public events
-INSERT INTO EVENTS (RSO_ID, UNIVERSITY_ID) VALUES 
-(NULL, NULL);
-
--- RSO specific events
-INSERT INTO EVENTS (RSO_ID, UNIVERSITY_ID) VALUES 
-(1, 1),
-(2, 2);
-
--- University wide events
-INSERT INTO EVENTS (RSO_ID, UNIVERSITY_ID) VALUES 
-(NULL, 1),
-(NULL, 2);
-
--- Approving some events
-INSERT INTO APPROVED_EVENTS (EVENT_ID, SUPER_ADMIN_ID) VALUES 
-(1, 1),
-(2, 2);
-
--- Adding comments to events
-INSERT INTO COMMENT (EVENT_ID, USER_ID, COMMENT, RATING) VALUES 
-(1, 1, 'Great event!', 5),
-(2, 2, 'Very informative.', 4);
-
-
-CALL find_all_events(1);
+-- Testing the procedure to find all events for a user
+CALL find_all_events((SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'techuser@techuniversity.com'));
+CALL find_all_events((SELECT USER_ID FROM USER_INFO WHERE EMAIL = 'artuser@artuniversity.com'));
