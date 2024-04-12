@@ -1,65 +1,76 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Assuming you're using react-router for navigation
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Modal from './modal';
 
 const NavCluster = ({ user }) => {
-
-    const [modalContent, setModalContent] = useState(null);
+    const [modalContent, setModalContent] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const handleOpenModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
+
+    const handleOpenModal = (content) => {
+        setModalContent(content);
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
 
     const buttonClusterStyle = {
         position: 'relative',
         top: '20px',
         left: '20px',
         display: 'flex',
-        flexDirection: 'row', // Align buttons in a row
-        gap: '10px', // Space between buttons
+        flexDirection: 'row',
+        gap: '10px',
     };
 
     const buttonStyle = {
-        padding: '10px 20px', // Padding around the text
+        padding: '10px 20px',
         border: 'none',
-        borderRadius: '5px', // Rounded borders
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)', // Shadow effect
+        borderRadius: '5px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
         cursor: 'pointer',
-        backgroundColor: '#f0f0f0', // Default background color for buttons except "Create Event"
-        color: 'black', // Default text color
+        backgroundColor: '#f0f0f0',
+        color: 'black',
     };
 
     const createButtonStyle = {
         ...buttonStyle,
-        backgroundColor: 'green', // Specific color for the Create button
-        color: 'white', // Text color for the Create button
+        backgroundColor: 'green',
+        color: 'white',
+    };
+
+    const renderModalContent = () => {
+        switch (modalContent) {
+            case 'createEvent':
+                return <h1>Create Event Form</h1>; // Replace with the actual form
+            case 'rso':
+                return <h1>RSO Management Form</h1>;
+            case 'university':
+                return <h1>University Management Form</h1>;
+            case 'approveEvents':
+                return <h1>Approve Events Form</h1>;
+            default:
+                return null;
+        }
     };
 
     return (
         <div style={buttonClusterStyle}>
             {['admin', 'superAdmin'].includes(user.role) && (
-                <button onClick={handleOpenModal} style={createButtonStyle}>Create Event</button>
+                <button onClick={() => handleOpenModal('createEvent')} style={createButtonStyle}>Create Event</button>
             )}
             <Modal show={showModal} onClose={handleCloseModal}>
-                <h1>Create Event</h1>
-                {/* Add form to create event */}
+                {renderModalContent()}
             </Modal>
-            
+
             {user.role === 'admin' && (
-                <Link to="/rso" style={{ textDecoration: 'none' }}>
-                    <button style={buttonStyle}>RSO</button>
-                    
-                </Link>
+                <button onClick={() => handleOpenModal('rso')} style={buttonStyle}>RSO</button>
             )}
             
             {user.role === 'superAdmin' && (
                 <>
-                    <Link to="/university" style={{ textDecoration: 'none' }}>
-                        <button style={buttonStyle}>University Page</button>
-                    </Link>
-                    <Link to="/approve-events" style={{ textDecoration: 'none' }}>
-                        <button style={buttonStyle}>Approve Events</button>
-                    </Link>
+                    <button onClick={() => handleOpenModal('university')} style={buttonStyle}>University Page</button>
+                    <button onClick={() => handleOpenModal('approveEvents')} style={buttonStyle}>Approve Events</button>
                 </>
             )}
         </div>
