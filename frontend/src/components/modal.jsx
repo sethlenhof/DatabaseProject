@@ -15,10 +15,9 @@ const Modal = ({ show, onClose, children }) => {
 
     useEffect(() => {
         if (!isVisible && shouldDisplay) {
-            // Only after the fade-out transition completes, remove the modal from the DOM
             const timer = setTimeout(() => {
-                setShouldDisplay(false);
-            }, 300); // This delay must match the transition duration
+                setShouldDisplay(false);  // Remove modal from DOM after fade-out completes
+            }, 300); // Ensure this matches your CSS transition duration
             return () => clearTimeout(timer);
         }
     }, [isVisible, shouldDisplay]);
@@ -55,7 +54,6 @@ const Modal = ({ show, onClose, children }) => {
         position: 'absolute',
         top: '10px',
         right: '10px',
-        marginLeft: 'auto',
         cursor: 'pointer',
         color: 'red',
         fontSize: '24px',

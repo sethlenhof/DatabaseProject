@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // Assuming you're using react-router for navigation
+import { useState } from 'react';
+import Modal from './modal';
 
 const NavCluster = ({ user }) => {
+
+    const [modalContent, setModalContent] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+
     const buttonClusterStyle = {
         position: 'relative',
         top: '20px',
@@ -30,14 +38,17 @@ const NavCluster = ({ user }) => {
     return (
         <div style={buttonClusterStyle}>
             {['admin', 'superAdmin'].includes(user.role) && (
-                <Link to="/create-event" style={{ textDecoration: 'none' }}>
-                    <button style={createButtonStyle}>Create Event</button>
-                </Link>
+                <button onClick={handleOpenModal} style={createButtonStyle}>Create Event</button>
             )}
+            <Modal show={showModal} onClose={handleCloseModal}>
+                <h1>Create Event</h1>
+                {/* Add form to create event */}
+            </Modal>
             
             {user.role === 'admin' && (
                 <Link to="/rso" style={{ textDecoration: 'none' }}>
                     <button style={buttonStyle}>RSO</button>
+                    
                 </Link>
             )}
             
