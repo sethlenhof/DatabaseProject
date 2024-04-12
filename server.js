@@ -110,6 +110,74 @@ app.post("/api/users/signup", (req, res) => {
 	});
 });
 
+// *===========================================================*
+// |                	CREATE EVENT API           			   |
+// *===========================================================*
+// Incoming: {username, rsoId, name, category, description, startTime, endTime, date, location, contactPhone, contactEmail}
+// Outgoing: { status }
+app.post("/api/events/create", (req, res) => {
+	const { username, rsoId, name, category, description, time, date, location, contactPhone, contactEmail } = req.body;
+	if (!username || !rsoId || !name || !category || !description || !startTime || !endTime || !date || !location || !contactPhone || !contactEmail) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	// Assuming 'sanitizeData' function is defined elsewhere to sanitize inputs
+	var data = sanitizeData({ username, rsoId, name, category, description, startTime, endTIme, date, location, contactPhone, contactEmail });
+	
+	//startTime and Date need to be formatted YYYY-MM-DDT12:00:00 -> 2024-04-10T12:00:00
+	startTime = date + "T" + startTime;
+	const sql = "CALL insert_event(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	const params = [data.username, data.rsoId, data.name, data.category, data.description, data.startTime, data.endTIme, data.date, data.location, data.contactPhone, data.contactEmail];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({});
+	});
+});
+
+
+// *===========================================================*
+// |                	GET RSO MEMBERSHIP API     			   |
+// *===========================================================*
+//Incoming: { userId }
+//Outgoing: { status, data }
+app.post("/api/rso/admin", (req, res) => {
+	const { userId } = req.body;
+	if (!userId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	// Assuming 'sanitizeData' function is defined elsewhere to sanitize inputs
+	var data = sanitizeData({ userId });
+
+	const sql = "CALL get_rso_membership(?)";
+	const params = [data.userId];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json(response);
+	});
+});
+
+
 
 // sanitizeData function to sanitize input data
 // prevent SQL injection

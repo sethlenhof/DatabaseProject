@@ -81,12 +81,18 @@ CREATE TABLE SUPER_ADMIN (
 
 CREATE TABLE EVENTS (
     EVENT_ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255),
+    CATEGORY VARCHAR(255),
+    EVENT_DESCRIPTION TEXT,
+    EVENT_LOCATION VARCHAR(255),
+    CONTACT_PHONE VARCHAR(255),
+    CONTACT_EMAIL VARCHAR(255),
     RSO_ID INT,
     UNIVERSITY_ID INT,
     EVENT_START VARCHAR(255),
     EVENT_END VARCHAR(255),
     FOREIGN KEY (RSO_ID) REFERENCES RSO(RSO_ID),
-    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
+    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID),
 );
 
 CREATE TABLE APPROVED_EVENTS (
@@ -204,6 +210,42 @@ BEGIN
     CALL find_private_events(input_user_id);
     CALL find_public_events();
 END //
+
+-- find RSO admin of
+DELIMITER //
+CREATE PROCEDURE get_rso_admin_membership(IN input_user_id CHAR(255))
+BEGIN
+    SELECT RSO.RSO_ID
+    FROM RSO
+    INNER JOIN RSO_ADMIN ON RSO.RSO_ID = RSO_ADMIN.RSO_ID
+    WHERE RSO_ADMIN.USER_ID = input_user_id;
+END //
+
+DELIMITER ;
+
+
+-- create event
+DELIMITER //
+
+CREATE PROCEDURE create_event(
+    IN p_rso_id INT,
+    IN p_university_id INT,
+    IN p_name VARCHAR(255),
+    IN p_category VARCHAR(255),
+    IN p_description TEXT,
+    IN p_event_start VARCHAR(255),
+    IN p_event_end VARCHAR(255),
+    IN p_location VARCHAR(255),
+    IN p_contact_phone VARCHAR(255),
+    IN p_contact_email VARCHAR(255)
+)
+BEGIN
+    INSERT INTO EVENTS (RSO_ID, UNIVERSITY_ID, EVENT_NAME, CATEGORY, EVENT_DESCRIPTION, EVENT_START, EVENT_END, EVENT_LOCATION, CONTACT_PHONE, CONTACT_EMAIL)
+    VALUES (p_rso_id, p_university_id, p_name, p_category, p_description, p_event_start, p_event_end, p_location, p_contact_phone, p_contact_email);
+END //
+
+DELIMITER ;
+
 
 
 CALL insert_user_login('admin@admin.com', 'Password1!');
