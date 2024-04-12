@@ -111,6 +111,92 @@ app.post("/api/users/signup", (req, res) => {
 });
 
 
+// event querying
+// all events
+app.post("/api/users/all_events", (req, res) => {
+	const { user_id } = req.body;
+	const sql = "CALL find_all_events(user_id)";
+
+	db.query(sql, [user_id], (err, results, fields) => {
+		if (err) {
+			// Handle SQL error
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json(response.RESPONSE_MESSAGE);
+	});
+
+});
+
+// private events
+app.post("/api/users/private_events", (req, res) => {
+	const { user_id } = req.body;
+	const sql = "CALL find_private_events(user_id)";
+
+	db.query(sql, [user_id], (err, results, fields) => {
+		if (err) {
+			// Handle SQL error
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json(response.RESPONSE_MESSAGE);
+	});
+
+});
+
+// public events
+app.post("/api/users/public_events", (req, res) => {
+	const { user_id } = req.body;
+	const sql = "CALL find_public_events(user_id)";
+
+	db.query(sql, [user_id], (err, results, fields) => {
+		if (err) {
+			// Handle SQL error
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json(response.RESPONSE_MESSAGE);
+	});
+
+});
+
+// RSO events
+app.post("/api/users/RSO_events", (req, res) => {
+	const { user_id } = req.body;
+	const sql = "CALL find_RSO_events(user_id)";
+
+	db.query(sql, [user_id], (err, results, fields) => {
+		if (err) {
+			// Handle SQL error
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json(response.RESPONSE_MESSAGE);
+	});
+
+});
+
+
 // sanitizeData function to sanitize input data
 // prevent SQL injection
 function sanitizeData(data) {
@@ -137,3 +223,4 @@ function sanitizeData(data) {
 	// Return data as is if it's not a string, array, or object
 	return data;
 }
+
