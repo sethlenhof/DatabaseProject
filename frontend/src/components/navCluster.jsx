@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Modal from './modal';
+import EventForm from './eventForm.jsx';
 
 const NavCluster = ({ user }) => {
     const [modalContent, setModalContent] = useState('');
@@ -42,7 +43,7 @@ const NavCluster = ({ user }) => {
     const renderModalContent = () => {
         switch (modalContent) {
             case 'createEvent':
-                return <h1>Create Event Form</h1>; // Replace with the actual form
+                return <EventForm />
             case 'rso':
                 return <h1>RSO Management Form</h1>;
             case 'university':
