@@ -2,7 +2,7 @@
   - [X] add login button functionality
 - [x] 2. Create a sign up page
   - [X] add sign up button functionality
-- [ ] 3. Create main landing page: shows all events
+- [X] 3. Create main landing page: shows all events
 - [ ] 4. Research showing data from events.ucf
 - [ ] 5. Add additional info for different users
   - [ ] a. Super admin: create profile for university
@@ -23,8 +23,8 @@ Components needed:
 
 - [X] 1. Login
 - [X] 2. Sign up
-- [ ] 3. Calender Component
-- [ ] 4. Event Feed Component
+- [X] 3. Calender Component
+- [X] 4. Event Feed Component
 - [ ] 5. Event Page Component
 - [ ] 6. College Profile Component
 - [ ] 7. RSO Profile Component
