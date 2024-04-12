@@ -33,11 +33,11 @@ export default class Dashboard extends React.Component {
                 }}>
                     <div style={{ width: '45%' }}>
                         <h1 style={{ textAlign: 'center' }}>Calendar</h1>
-                        <MyCalendar />
+                        <MyCalendar events={this.events}/>
                     </div>
                     <div style={{ width: '45%' }}>
                         <h1 style={{ textAlign: 'center' }}>Upcoming Events</h1>
-                        <ListView />
+                        <ListView events={this.events} />
                     </div>
                 </div>
             </div>
