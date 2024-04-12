@@ -67,7 +67,6 @@ const Modal = ({ show, onClose, children }) => {
                 backgroundColor: 'white',
                 padding: '20px',
                 borderRadius: '10px',
-                maxWidth: '500px',
                 width: '80%',
                 maxHeight: '90%',
                 overflowY: 'auto',
