@@ -10,15 +10,15 @@ import ErrorMessage from './errorMessage.jsx';
 
 const EventForm = () => {
     const [eventData, setEventData] = useState({
-        name: '',
-        category: '',
-        description: '',
-        startTime: null,
-        endTime: null,
-        date: null,
-        location: '',
-        contactPhone: '',
-        contactEmail: ''
+        name: 'a',
+        category: 'a',
+        description: 'a',
+        startTime: new Date(),
+        endTime: new Date(),
+        date: new Date(),
+        location: 'a',
+        contactPhone: 'a',
+        contactEmail: 'a'
     });
     
     const [errors, setErrors] = useState({});
@@ -45,6 +45,8 @@ const EventForm = () => {
         let newErrors = {};
         // Check each field and add errors accordingly
         if (!eventData.name) newErrors.name = "Event name is required.";
+        if (!eventData.category) newErrors.category = "Category is required.";
+        if (!eventData.description) newErrors.description = "Description is required.";
         if (!eventData.date) newErrors.date = "Event date is required.";
         if (!eventData.startTime) newErrors.startTime = "Start time is required.";
         if (!eventData.endTime) newErrors.endTime = "End time is required.";
@@ -52,7 +54,7 @@ const EventForm = () => {
         if (!eventData.contactPhone) newErrors.contactPhone = "Contact phone is required.";
         if (!eventData.contactEmail) newErrors.contactEmail = "Contact email is required.";
 
-    
+
         // Set a general error message if more than two fields are missing
         const numberOfErrors = Object.keys(newErrors).length;
         if (numberOfErrors > 1) {
@@ -66,16 +68,27 @@ const EventForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        console.log('Submitting event data:', eventData);
-        // Validate the form data
         if (validateForm() === false) {
-            //error
             console.log('Missing fields');
             return;
         }
-
-        console.log('Submitting event data:', eventData);
+    
+        // Formatting date in YYYY-DD-MM format
+        let formattedDate = `${eventData.date.getFullYear()}-${(eventData.date.getMonth() + 1).toString().padStart(2, '0')}-${eventData.date.getDate().toString().padStart(2, '0')}`;
+        
+        // Formatting startTime and endTime in HH:MM:SS format
+        let formattedStartTime = `${eventData.startTime.getHours().toString().padStart(2, '0')}:${eventData.startTime.getMinutes().toString().padStart(2, '0')}:00`;
+        let formattedEndTime = `${eventData.endTime.getHours().toString().padStart(2, '0')}:${eventData.endTime.getMinutes().toString().padStart(2, '0')}:00`;
+    
+        // Update the eventData with formatted date and time
+        const updatedEventData = {
+            ...eventData,
+            date: formattedDate,
+            startTime: formattedStartTime,
+            endTime: formattedEndTime
+        };
+    
+        console.log('Formatted event data:', updatedEventData);
         // Here you would usually handle the submission, e.g., sending data to a server
     };
 
