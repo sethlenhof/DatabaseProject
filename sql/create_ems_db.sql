@@ -167,7 +167,7 @@ DELIMITER ;
 
 -- Find RSO EVENTS for user
 DELIMITER //
-CREATE PROCEDURE find_RSO_events(IN input_user_id INT)
+CREATE PROCEDURE find_RSO_events(IN input_user_id CHAR(255))
 BEGIN
     -- select all events for the RSOs that the user is a part of
     SELECT * FROM EVENTS WHERE RSO_ID IN (SELECT RSO_ID FROM STUDENT WHERE USER_ID = input_user_id);
@@ -176,7 +176,7 @@ DELIMITER ;
 
 -- find PRIVATE EVENTS for user (where there is no RSO but is University)
 DELIMITER //
-CREATE PROCEDURE find_private_events(IN input_user_id INT)
+CREATE PROCEDURE find_private_events(IN input_user_id CHAR(255))
 BEGIN
     -- select all events for the university that the user is a part of
     SELECT * FROM EVENTS WHERE UNIVERSITY_ID = (SELECT UNIVERSITY_ID FROM USER_INFO WHERE USER_ID = input_user_id) AND RSO_ID IS NULL;
@@ -193,7 +193,7 @@ END //
 
 -- find ALL EVENTS for user
 DELIMITER //
-CREATE PROCEDURE find_all_events(IN input_user_id INT)
+CREATE PROCEDURE find_all_events(IN input_user_id CHAR(255))
 BEGIN
     -- select all events for the user, calling other procedures
     CALL find_RSO_events(input_user_id);
