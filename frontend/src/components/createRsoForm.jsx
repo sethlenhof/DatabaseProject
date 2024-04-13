@@ -15,18 +15,17 @@ const CreateRso = () => {
         borderRadius: '5px',
         border: '1px solid #ccc',
         fontSize: '16px',
-        width: '100%', // Ensures that the width matches other inputs
-        boxSizing: 'border-box', // Ensures padding and borders are included in the width calculation
-        appearance: 'none' // Removes default system styling on dropdowns
+        width: '100%',
+        boxSizing: 'border-box',
+        appearance: 'none'
     };
     
     const selectStyle = {
         ...inputStyle,
         backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="rgba(0,0,0,0.54)" d="M7 10l5 5 5-5z"/></svg>')`,
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'right 10px center', // Positions the arrow icon correctly
-        backgroundSize: '12px', // Ensures the arrow icon is not too big
-        // Additional padding to the right to ensure text does not overlap the arrow icon
+        backgroundPosition: 'right 10px center',
+        backgroundSize: '12px',
         paddingRight: '30px'
     };
     
