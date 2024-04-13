@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "./button";
+import { FormField } from './formField.jsx';
 
 const CreateRso = () => {
     const id = localStorage.getItem('id');
@@ -11,34 +12,24 @@ const CreateRso = () => {
 
     const inputStyle = {
         padding: '10px',
-        margin: '0 10px',
-        flex: 1,
         borderRadius: '5px',
         border: '1px solid #ccc',
         fontSize: '16px',
-        outline: 'none',
-        boxShadow: 'none', // default state without shadow
+        width: '100%', // Ensures that the width matches other inputs
+        boxSizing: 'border-box', // Ensures padding and borders are included in the width calculation
+        appearance: 'none' // Removes default system styling on dropdowns
     };
-
-    const focusedInputStyle = {
-        boxShadow: '0 0 8px rgba(0, 0, 0, 0.7)', // blue glow effect
+    
+    const selectStyle = {
+        ...inputStyle,
+        backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="rgba(0,0,0,0.54)" d="M7 10l5 5 5-5z"/></svg>')`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 10px center', // Positions the arrow icon correctly
+        backgroundSize: '12px', // Ensures the arrow icon is not too big
+        // Additional padding to the right to ensure text does not overlap the arrow icon
+        paddingRight: '30px'
     };
-
-    const labelStyle = {
-        width: '150px', // Set a fixed width for better alignment
-        margin: '10px',
-        textAlign: 'right',
-        fontSize: '16px',
-    };
-
-    const divStyle = {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '100%',
-        justifyContent: 'space-between',
-        marginBottom: '20px',
-    };
+    
 
     const formStyle = {
         display: 'flex',
@@ -57,9 +48,8 @@ const CreateRso = () => {
 
     return (
         <form style={formStyle}>
-            <h1 style={headerStyle}>Create RSO</h1>
-            <div style={divStyle}>
-                <label style={labelStyle}>Name:</label>
+            <h1 style={headerStyle}>Create Registered Student Organization</h1>
+            <FormField label="Name:">
                 <input
                     style={inputStyle}
                     type="text"
@@ -67,51 +57,39 @@ const CreateRso = () => {
                     placeholder="Enter RSO Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    onFocus={(e) => e.target.style.boxShadow = focusedInputStyle.boxShadow}
-                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                 />
-            </div>
-            <div style={divStyle}>
-                <label style={labelStyle}>Type:</label>
+            </FormField>
+            <FormField label="Type:">
                 <select
-                    style={inputStyle}
+                    style={selectStyle}
                     name="type"
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                    onFocus={(e) => e.target.style.boxShadow = focusedInputStyle.boxShadow}
-                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                 >
                     <option value="">Select Type</option>
                     <option value="Fraternity">Fraternity</option>
                     <option value="Club">Club</option>
                     <option value="Honor Society">Honor Society</option>
                 </select>
-            </div>
-            <div style={divStyle}>
-                <label style={labelStyle}>Description:</label>
+            </FormField>
+            <FormField label="Description:">
                 <textarea
                     style={{...inputStyle, minHeight: '100px', resize: 'vertical'}}
                     name="description"
                     placeholder="RSO Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    onFocus={(e) => e.target.style.boxShadow = focusedInputStyle.boxShadow}
-                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                 />
-            </div>
-            <div style={divStyle}>
-                <label style={labelStyle}>Members:</label>
+            </FormField>
+            <FormField label="Members:">
                 <textarea
-                    style={inputStyle}
-                    type="text"
+                    style={{...inputStyle, minHeight: '100px', resize: 'vertical'}}
                     name="members"
-                    placeholder="Enter Member Emails with Commas example: johndoe@gmail.com,jilldoe@gmail.com"
+                    placeholder="Enter Member Emails (comma separated)"
                     value={members}
                     onChange={(e) => setMembers(e.target.value)}
-                    onFocus={(e) => e.target.style.boxShadow = focusedInputStyle.boxShadow}
-                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                 />
-            </div>
+            </FormField>
             <Button onClick={() => console.log('Form submitted')}>Submit</Button>
         </form>
     );
