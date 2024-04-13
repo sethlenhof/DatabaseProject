@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Modal from './modal';
 import EventForm from './eventForm.jsx';
-import RsoForm from './createRso.jsx';
+import RsoForm from './createRsoForm.jsx';
+import UniversityProfileForm from './universityForm.jsx';
 
 const NavCluster = ({ user }) => {
     const [modalContent, setModalContent] = useState('');
@@ -48,7 +49,7 @@ const NavCluster = ({ user }) => {
             case 'create-rso':
                 return <RsoForm />;
             case 'university':
-                return <h1>University Management Form</h1>;
+                return <UniversityProfileForm />;
             case 'approveEvents':
                 return <h1>Approve Events Form</h1>;
             case 'join-rso':
