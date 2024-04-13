@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Modal from './modal';
 import EventForm from './eventForm.jsx';
+import RsoForm from './createRsoForm.jsx';
+import UniversityProfileForm from './universityForm.jsx';
 
 const NavCluster = ({ user }) => {
     const [modalContent, setModalContent] = useState('');
@@ -44,12 +46,14 @@ const NavCluster = ({ user }) => {
         switch (modalContent) {
             case 'createEvent':
                 return <EventForm />
-            case 'rso':
-                return <h1>RSO Management Form</h1>;
+            case 'create-rso':
+                return <RsoForm />;
             case 'university':
-                return <h1>University Management Form</h1>;
+                return <UniversityProfileForm />;
             case 'approveEvents':
                 return <h1>Approve Events Form</h1>;
+            case 'join-rso':
+                return <h1>RSO Join Form</h1>;
             default:
                 return null;
         }
@@ -63,17 +67,16 @@ const NavCluster = ({ user }) => {
             <Modal show={showModal} onClose={handleCloseModal}>
                 {renderModalContent()}
             </Modal>
-
-            {user.role === 'admin' && (
-                <button onClick={() => handleOpenModal('rso')} style={buttonStyle}>RSO</button>
-            )}
-            
             {user.role === 'superAdmin' && (
                 <>
                     <button onClick={() => handleOpenModal('university')} style={buttonStyle}>University Page</button>
                     <button onClick={() => handleOpenModal('approveEvents')} style={buttonStyle}>Approve Events</button>
                 </>
             )}
+            <button onClick={() => handleOpenModal('create-rso')} style={buttonStyle}>Create RSO</button>
+            <button onClick={() => handleOpenModal('join-rso')} style={buttonStyle}>Join RSO</button>
+
+
         </div>
     );
 };

@@ -1,11 +1,11 @@
 - [x] 1. Create a login page
-  - [X] add login button functionality
+  - [x] add login button functionality
 - [x] 2. Create a sign up page
-  - [X] add sign up button functionality
-- [X] 3. Create main landing page: shows all events
+  - [x] add sign up button functionality
+- [x] 3. Create main landing page: shows all events
 - [ ] 4. Research showing data from events.ucf
 - [ ] 5. Add additional info for different users
-  - [ ] a. Super admin: create profile for university
+  - [] a. Super admin: create profile for university
     - Name, location, num students, pictures, etc
   - [ ] b. Admin: create events, owns an RSO with a university
   - [ ] c. Student: can join RSOs, attend events
@@ -21,16 +21,16 @@
 
 Components needed:
 
-- [X] 1. Login
-- [X] 2. Sign up
-- [X] 3. Calender Component
-- [X] 4. Event Feed Component
+- [x] 1. Login
+- [x] 2. Sign up
+- [x] 3. Calender Component
+- [x] 4. Event Feed Component
 - [ ] 5. Event Page Component
-- [ ] 6. College Profile Component
-- [ ] 7. RSO Profile Component
+- [x] 6. College Profile Component
+- [] 7. RSO Profile Component
 - [ ] 8. Event Approval Component
-- [ ] 9. Create event Component
-- [ ] 10. Create RSO Component
+- [x] 9. Create event Component
+- [x] 10. Create RSO Component
 
 Queries needed:
 
