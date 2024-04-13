@@ -71,7 +71,7 @@ const UniversityProfileForm = () => {
     };
 
     return (
-        <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
+        <div style={{ padding: '20px', maxWidth: '50vw', margin: 'auto', display:'flex', justifyContent:'start' }}>
             <form onSubmit={handleSubmit} style={formStyle}>
             <h1 style={headerStyle}>Create University Profile</h1>
                 <FormField label="Name:">
