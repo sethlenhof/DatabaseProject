@@ -7,6 +7,7 @@ const CreateRso = () => {
     const [name, setName] = React.useState("");
     const [type, setType] = React.useState("");
     const [description, setDescription] = React.useState("");
+    const [members, setMembers] = React.useState("");
 
     const inputStyle = {
         padding: '10px',
@@ -94,6 +95,19 @@ const CreateRso = () => {
                     placeholder="RSO Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    onFocus={(e) => e.target.style.boxShadow = focusedInputStyle.boxShadow}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
+                />
+            </div>
+            <div style={divStyle}>
+                <label style={labelStyle}>Members:</label>
+                <textarea
+                    style={inputStyle}
+                    type="text"
+                    name="members"
+                    placeholder="Enter Member Emails with Commas example: johndoe@gmail.com,jilldoe@gmail.com"
+                    value={members}
+                    onChange={(e) => setMembers(e.target.value)}
                     onFocus={(e) => e.target.style.boxShadow = focusedInputStyle.boxShadow}
                     onBlur={(e) => e.target.style.boxShadow = 'none'}
                 />

@@ -19,7 +19,7 @@ export default class Dashboard extends React.Component {
                 height: '100vh',
                 overflow: 'hidden',
             }}>
-                <NavCluster user={{ role: 'superAdmin' }} />
+                <NavCluster user={{ role: 'admin' }} />
                 <div style={{
                         textAlign: 'center',
                     }}>
