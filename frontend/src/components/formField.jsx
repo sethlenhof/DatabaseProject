@@ -14,11 +14,17 @@ export const FormField = ({ label, children }) => {
                 width: '30%',
                 margin: '10px',
                 textAlign: 'right',
-                fontSize: '16px',
+                fontSize: '1rem',
             }}>{label}</label>
             <div style={{
                 width: '70%',
                 margin: '0 10px',
+                '::placeholder': {
+                    color: '#aaa',
+                    fontSize: '1rem',
+                    opacity: 1,
+
+                } 
             }}>
                 {children}
             </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../components/button.jsx';
-import { FormField } from './formField.jsx'; 
+import { FormField } from './formField.jsx';
 import ErrorMessage from './errorMessage.jsx';
 
 const UniversityProfileForm = () => {
@@ -47,10 +47,33 @@ const UniversityProfileForm = () => {
         borderBottom: '2px solid #ccc'
     };
 
+    const formStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '20px',
+        width: '60vw',
+        margin: 'auto',
+        fontFamily: 'Arial, sans-serif'
+    };
+
+    const inputStyle = {
+        padding: '10px',
+        width: '100%',
+        borderRadius: '5px',
+        border: '1px solid #ccc',
+        fontSize: '1rem',
+        '::placeholder': {
+            color: '#aaa',
+            fontSize: '1rem',
+            opacity: 1,
+        }
+    };
+
     return (
         <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <h1 style={headerStyle}>Create University Profile</h1>
+            <form onSubmit={handleSubmit} style={formStyle}>
+            <h1 style={headerStyle}>Create University Profile</h1>
                 <FormField label="Name:">
                     <input
                         type="text"
@@ -58,7 +81,7 @@ const UniversityProfileForm = () => {
                         value={universityData.name}
                         onChange={handleChange}
                         placeholder="Enter university name"
-                        style={{ padding: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}
+                        style={inputStyle}
                     />
                     {errors.name && <ErrorMessage error={errors.name} />}
                 </FormField>
@@ -69,7 +92,7 @@ const UniversityProfileForm = () => {
                         value={universityData.location}
                         onChange={handleChange}
                         placeholder="Enter location"
-                        style={{ padding: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}
+                        style={inputStyle}
                     />
                     {errors.location && <ErrorMessage error={errors.location} />}
                 </FormField>
@@ -79,7 +102,7 @@ const UniversityProfileForm = () => {
                         value={universityData.description}
                         onChange={handleChange}
                         placeholder="Enter description"
-                        style={{ padding: '10px', width: '100%', height: '100px', borderRadius: '5px', border: '1px solid #ccc' }}
+                        style={{...inputStyle, height: '100px'}}
                     />
                     {errors.description && <ErrorMessage error={errors.description} />}
                 </FormField>
@@ -90,7 +113,7 @@ const UniversityProfileForm = () => {
                         value={universityData.numberOfStudents}
                         onChange={handleChange}
                         placeholder="Enter number of students"
-                        style={{ padding: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}
+                        style={inputStyle}
                     />
                     {errors.numberOfStudents && <ErrorMessage error={errors.numberOfStudents} />}
                 </FormField>
