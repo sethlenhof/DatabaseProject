@@ -110,6 +110,36 @@ app.post("/api/users/signup", (req, res) => {
 	});
 });
 
+// *===========================================================*
+// |                 USER TYPE API                             |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status, userType }
+app.post("/api/users/type", (req, res) => {
+    const { userId } = req.query; // Assuming the user_id is passed as a query parameter
+
+    if (!userId) {
+        return res.status(400).json({ error: "Missing Fields" });
+    }
+	var data = sanitizeData({ userId });
+    const sql = "CALL get_user_type(?)";
+    const params = [data.userId];
+    db.query(sql, params, function (err, results) {
+        if (err) {
+            return res.status(400).json({ error: "SQL error", details: err.message });
+        }
+        
+        const response = results[0][0]; // Assuming that the stored procedure returns the result in the first index
+        if (response) {
+            return res.status(200).json({
+                user_type: response.RESPONSE_MESSAGE
+            });
+        } else {
+            return res.status(404).json({ error: "User not found" });
+        }
+    });
+});
+
 
 // sanitizeData function to sanitize input data
 // prevent SQL injection

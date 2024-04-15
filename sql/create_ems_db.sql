@@ -33,24 +33,24 @@ CREATE TABLE USER_LOGIN (
 );
 
 CREATE TABLE UNIVERSITY (
-    UNIVERSITY_ID INT AUTO_INCREMENT PRIMARY KEY,
-    NAME VARCHAR(255),
-    LOCATION VARCHAR(255),
-    DESCRIPTION TEXT,
+    UNIVERSITY_ID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    UNIVERSITY_NAME VARCHAR(255),
+    UNIVERSITY_LOCATION VARCHAR(255),
+    UNI_DESCRIPTION TEXT,
     NUM_OF_STUDENTS INT,
     COLOR VARCHAR(255)
 );
 
 CREATE TABLE RSO (
     RSO_ID INT AUTO_INCREMENT PRIMARY KEY,
-    NAME VARCHAR(255),
+    RSO_NAME VARCHAR(255),
     COLOR VARCHAR(255),
-    DESCRIPTION TEXT
+    RSO_DESCRIPTION TEXT
 );
 
 CREATE TABLE USER_INFO (
     USER_ID CHAR(255) PRIMARY KEY,
-    NAME VARCHAR(255),
+    USERS_NAME VARCHAR(255),
     UNIVERSITY_ID INT,
     FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
 );
@@ -83,6 +83,7 @@ CREATE TABLE EVENTS (
     EVENT_ID INT AUTO_INCREMENT PRIMARY KEY,
     RSO_ID INT,
     UNIVERSITY_ID INT,
+    EVENT_LOCATION VARCHAR(255),
     EVENT_START VARCHAR(255),
     EVENT_END VARCHAR(255),
     FOREIGN KEY (RSO_ID) REFERENCES RSO(RSO_ID),
@@ -136,7 +137,7 @@ BEGIN
     ELSE
         -- Insert the new user if the email does not exist
         INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES (userGUID, input_email, SHA2(input_pass, 256));
-        INSERT INTO RESPONSE VALUES ('Success', 'User added');
+        INSERT INTO RESPONSE VALUES ('Success', CONCAT('User added ', userGUID));
     END IF;
     SELECT * FROM RESPONSE;
     DROP TEMPORARY TABLE RESPONSE;
@@ -170,41 +171,156 @@ END //
 DELIMITER ;
 
 -- Find RSO events for user
-DELIMITER //
-CREATE PROCEDURE find_RSO_even(IN input_user_id INT)
-BEGIN
-    -- select all events for the RSOs that the user is a part of
-    SELECT * FROM EVENTS WHERE RSO_ID IN (SELECT RSO_ID FROM STUDENT WHERE USER_ID = input_user_id);
-END //
-DELIMITER ;
+-- REDO THIS--------------------------------
+-- DELIMITER //
+-- CREATE PROCEDURE find_RSO_even(IN input_user_id INT)
+-- BEGIN
+--     -- select all events for the RSOs that the user is a part of
+--     SELECT * FROM EVENTS WHERE RSO_ID IN (SELECT RSO_ID FROM STUDENT WHERE USER_ID = input_user_id);
+-- END //
+-- DELIMITER ;
 
--- find private events for user (where there is no RSO but is University)
-DELIMITER //
-CREATE PROCEDURE find_private_events(IN input_user_id INT)
-BEGIN
-    -- select all events for the university that the user is a part of
-    SELECT * FROM EVENTS WHERE UNIVERSITY_ID = (SELECT UNIVERSITY_ID FROM USER_INFO WHERE USER_ID = input_user_id) AND RSO_ID IS NULL;
-END //
-DELIMITER ;
+-- -- find private events for user (where there is no RSO but is University)
+-- DELIMITER //
+-- CREATE PROCEDURE find_private_events(IN input_user_id INT)
+-- BEGIN
+--     -- select all events for the university that the user is a part of
+--     SELECT * FROM EVENTS WHERE UNIVERSITY_ID = (SELECT UNIVERSITY_ID FROM USER_INFO WHERE USER_ID = input_user_id) AND RSO_ID IS NULL;
+-- END //
+-- DELIMITER ;
 
--- find public events for user (where there is no RSO and no University)
-DELIMITER //
-CREATE PROCEDURE find_public_events()
-BEGIN
-    -- select all events that are public
-    SELECT * FROM EVENTS WHERE UNIVERSITY_ID IS NULL AND RSO_ID IS NULL;
-END //
+-- -- find public events for user (where there is no RSO and no University)
+-- DELIMITER //
+-- CREATE PROCEDURE find_public_events()
+-- BEGIN
+--     -- select all events that are public
+--     SELECT * FROM EVENTS WHERE UNIVERSITY_ID IS NULL AND RSO_ID IS NULL;
+-- END //
 
--- find all events for user
-DELIMITER //
-CREATE PROCEDURE find_all_events(IN input_user_id INT)
-BEGIN
-    -- select all events for the user, calling other procedures
-    CALL find_RSO_even(input_user_id);
-    CALL find_private_events(input_user_id);
-    CALL find_public_events();
-END //
+-- -- find all events for user
+-- DELIMITER //
+-- CREATE PROCEDURE find_all_events(IN input_user_id INT)
+-- BEGIN
+--     -- select all events for the user, calling other procedures
+--     CALL find_RSO_even(input_user_id);
+--     CALL find_private_events(input_user_id);
+--     CALL find_public_events();
+-- END //
+-- DELIMITER ;
 
 
 CALL insert_user_login('admin@admin.com', 'Password1!');
 CALL validate_user('admin@admin.com', 'Password1!');
+
+
+
+use event_management_system;
+DROP PROCEDURE IF EXISTS insert_super_admin;
+
+DELIMITER //
+CREATE PROCEDURE insert_super_admin(
+    IN admin_email VARCHAR(255),
+    IN admin_name VARCHAR(255),
+    IN university_name VARCHAR(255) -- Placeholder name
+)
+BEGIN
+    DECLARE userID CHAR(255);
+    DECLARE uni_id INT;
+    DECLARE user_exists INT DEFAULT 0;
+    DECLARE super_admin_exists INT DEFAULT 0;
+
+    -- Check if user exists in USER_LOGIN and retrieve userID
+    SELECT COUNT(*) INTO user_exists FROM USER_LOGIN WHERE EMAIL = admin_email;
+    IF user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: No user found with the specified email';
+    END IF;
+
+    -- Retrieve userID
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = admin_email;
+    IF userID IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: User ID is null after selection.';
+    ELSE
+        SELECT 'User ID retrieved successfully', userID;
+    END IF;
+
+     -- Check if a super admin entry already exists for this userID
+    SELECT COUNT(*) INTO super_admin_exists FROM SUPER_ADMIN WHERE USER_ID = userID;
+    IF super_admin_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: A super admin entry already exists for this user';
+    END IF;
+
+    START TRANSACTION;
+
+    -- Insert the new university with minimal initial data
+    INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNI_DESCRIPTION, NUM_OF_STUDENTS, COLOR)
+    VALUES (university_name, NULL, NULL, NULL, NULL);
+
+    -- Get the last inserted university ID
+    SET uni_id = LAST_INSERT_ID();
+
+    -- Insert or update user info
+    INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID)
+    VALUES (userID, admin_name, uni_id)
+    ON DUPLICATE KEY UPDATE USERS_NAME = VALUES(USERS_NAME), UNIVERSITY_ID = VALUES(UNIVERSITY_ID);
+
+    -- Insert into SUPER_ADMIN table
+    INSERT INTO SUPER_ADMIN (USER_ID, UNIVERSITY_ID)
+    VALUES (userID, uni_id)
+    ON DUPLICATE KEY UPDATE UNIVERSITY_ID = VALUES(UNIVERSITY_ID);
+
+    COMMIT;
+END //
+
+DELIMITER ;
+
+-- Call the procedure
+CALL insert_super_admin('admin@admin.com', 'Admin Name', 'University Name');
+
+SELECT * FROM SUPER_ADMIN;
+
+
+-- PROCEDURE TO FIND USER TYPE
+DELIMITER //
+
+CREATE PROCEDURE get_user_type(IN input_user_id CHAR(255))
+BEGIN
+    -- Variables to check user's role
+    DECLARE is_student INT DEFAULT 0;
+    DECLARE is_rso_admin INT DEFAULT 0;
+    DECLARE is_super_admin INT DEFAULT 0;
+    DECLARE user_type VARCHAR(255);
+
+    -- Create a temporary table for the response
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
+    -- Check if the user is a student
+    SELECT COUNT(*) INTO is_student FROM STUDENT WHERE USER_ID = input_user_id;
+    -- Check if the user is an RSO admin
+    SELECT COUNT(*) INTO is_rso_admin FROM RSO_ADMIN WHERE USER_ID = input_user_id;
+    -- Check if the user is a super admin
+    SELECT COUNT(*) INTO is_super_admin FROM SUPER_ADMIN WHERE USER_ID = input_user_id;
+
+    -- Determine the user type
+    IF is_super_admin > 0 THEN
+        SET user_type = 'Super Admin';
+    ELSEIF is_rso_admin > 0 THEN
+        SET user_type = 'RSO Admin';
+    ELSEIF is_student > 0 THEN
+        SET user_type = 'Student';
+    ELSE
+        SET user_type = 'Unknown';
+    END IF;
+
+    -- Insert the result into the response table
+    INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) 
+    VALUES ('Success', user_type);
+
+    -- Select all responses
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE RESPONSE;
+END //
+
+DELIMITER ;
