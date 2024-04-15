@@ -4,46 +4,63 @@ import NavCluster from '../components/navCluster';
 import ListView from '../components/listView';
 
 export default class Dashboard extends React.Component {
-    state = {
-        // Define your state here
-        userType: '',
-        isLoading: true,
-        userId: localStorage.getItem("user"),
+    constructor(props) {
+        super(props);
+        console.log("constructor called")
+        this.state = {
+            // Define your state here
+            userType: '',
+            isLoading: true,
+            userId: localStorage.getItem("user"),
 
-        // Define your events array
-        events: [
-            // ways to format the data
-            {title: 'Goon', start: '2024-04-10T10:00:00', end: '2024-04-10T12:00:00', color: '#ff9f89'},
-            {title: 'test day', date: '2024-04-13', color: '#ff9f89'},
-        ]
-    };
+            // Define your events array
+            events: [
+                // ways to format the data
+                {title: 'Goon', start: '2024-04-10T10:00:00', end: '2024-04-10T12:00:00', color: '#ff9f89'},
+                {title: 'test day', date: '2024-04-13', color: '#ff9f89'},
+            ]
+        };
+    }
+    
 
     componentDidMount() {
-        
+        console.log("component did mount")
+        this.fetchUserType();
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        console.log('Parent component did update');
+    }
+    
+    componentWillUnmount() {
+        console.log('Parent component will unmount');
+    }
+    
+
     //fetch userType
-    async fetchUserType() {
-        fetch("/api/users/type", {
-            method: "POST",
+    fetchUserType = () => {
+        const url = `/api/users/type?userId=${this.state.userId}`;
+        fetch(url, {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                userId: this.state.userId,
-            }),
         }).then((data) => {
             if (data.status === 200) {
                 data.json().then((data) => {
                     this.setState({ userType: data.userType, isLoading: false});
                 });
             } else {
+                this.setState({ isLoading: false });
                 console.log("Error fetching user type");
             }
         });
     }
 
     render() {
+        if (this.state.isLoading) {
+            return <div>Loading...</div>;
+        }
         return (
             <div style={{
                 display: 'flex',

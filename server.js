@@ -115,8 +115,8 @@ app.post("/api/users/signup", (req, res) => {
 // *===========================================================*
 // Incoming: { userId }
 // Outgoing: { status, userType }
-app.post("/api/users/type", (req, res) => {
-    const { userId } = req.query; // Assuming the user_id is passed as a query parameter
+app.get("/api/users/type", (req, res) => {
+    const { userId } = req.query; // Assuming the userId is passed as a query parameter
 
     if (!userId) {
         return res.status(400).json({ error: "Missing Fields" });
@@ -131,8 +131,9 @@ app.post("/api/users/type", (req, res) => {
         
         const response = results[0][0]; // Assuming that the stored procedure returns the result in the first index
         if (response) {
+			console.log(response);
             return res.status(200).json({
-                user_type: response.RESPONSE_MESSAGE
+                userType: response.RESPONSE_MESSAGE
             });
         } else {
             return res.status(404).json({ error: "User not found" });
