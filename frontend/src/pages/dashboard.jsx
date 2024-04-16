@@ -27,10 +27,6 @@ export default class Dashboard extends React.Component {
         console.log("component did mount")
         this.fetchUserType();
     }
-
-    componentDidUpdate(prevProps, prevState) {
-        console.log('Parent component did update');
-    }
     
     componentWillUnmount() {
         console.log('Parent component will unmount');
