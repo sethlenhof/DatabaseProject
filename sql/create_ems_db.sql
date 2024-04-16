@@ -212,7 +212,8 @@ DELIMITER ;
 CALL insert_user_login('admin@admin.com', 'Password1!');
 CALL validate_user('admin@admin.com', 'Password1!');
 
-
+CALL insert_user_login('test@test.com', 'Password1!');
+CALL validate_user('test@test.com', 'Password1!');
 
 use event_management_system;
 DROP PROCEDURE IF EXISTS insert_super_admin;
@@ -323,4 +324,92 @@ BEGIN
     DROP TEMPORARY TABLE RESPONSE;
 END //
 
+-- create a new RSO and assign the creating user as the admin
+DELIMITER //
+CREATE PROCEDURE create_rso_and_admin(
+    IN input_user_id CHAR(255),
+    IN rso_name VARCHAR(255),
+    IN rso_color VARCHAR(255),
+    IN rso_description TEXT
+)
+BEGIN
+    DECLARE new_rso_id INT;
+    DECLARE existing_admin_count INT;
+    DECLARE existing_rso_count INT;
+    DECLARE existing_user_count INT;
+
+    -- Check if an RSO with the same name already exists
+    SELECT COUNT(*) INTO existing_rso_count FROM RSO WHERE RSO_NAME = rso_name;
+
+    -- Start the transaction here to ensure all following operations are atomic
+    START TRANSACTION;
+
+    IF existing_rso_count > 0 THEN
+        -- If an RSO with this name exists, rollback and signal an error
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'An RSO with this name already exists.';
+    ELSEIF existing_user_count = 0 THEN
+        -- If user does not exist, rollback and signal an error
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: User ID does not exist in USER_INFO.';
+    ELSE
+        -- Insert new RSO
+        INSERT INTO RSO (RSO_NAME, COLOR, RSO_DESCRIPTION)
+        VALUES (rso_name, rso_color, rso_description);
+
+        -- Capture the RSO_ID of the newly created RSO
+        SET new_rso_id = LAST_INSERT_ID();
+
+        -- Check if there is already an admin for the new RSO
+        SELECT COUNT(*) INTO existing_admin_count FROM RSO_ADMIN WHERE RSO_ID = new_rso_id;
+
+        -- Proceed only if there is no admin already set for this RSO
+        IF existing_admin_count = 0 THEN
+            -- Assign the creating user as the RSO admin
+            INSERT INTO RSO_ADMIN (USER_ID, RSO_ID)
+            VALUES (input_user_id, new_rso_id);
+
+            -- Commit the transaction if all operations were successful
+            COMMIT;
+        ELSE
+            -- Rollback if an admin already exists
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'An admin already exists for this RSO.';
+        END IF;
+    END IF;
+END //
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS testRSO;
+
+-- Call the procedure using a test user
+DELIMITER //
+    CREATE PROCEDURE testRSO()
+    BEGIN
+
+    DECLARE userID CHAR(255);
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'test@test.com';
+    
+
+    CALL create_rso_and_admin(userID, 'RSO Name', 'RSO Color', 'RSO Description');
+
+    SELECT * FROM RSO;
+    SELECT * FROM RSO_ADMIN;
+    SELECT * FROM STUDENT;
+
+    -- Call the procedure again to see the error message
+    CALL create_rso_and_admin(userID, 'RSO Name', 'RSO Color', 'RSO Description');
+    END //
+DELIMITER ;
+
+CALL testRSO();
+
+
+
+-- TO DO:
+-- 1. Update procedure for sign up to include user info and set as student
+-- 2. update sign up endpoint to call the updated procedure
+-- 3. Update front end to include user info
+-- 4. make logic where if user is super admin, their email prefix is used to identify students
+-- 5. use this in endpoint to set student university
+-- OR make it so a user registers as a student at a university and then can create an RSO at that school
