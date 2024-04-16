@@ -61,7 +61,7 @@ const NavCluster = ({ user }) => {
 
     return (
         <div style={buttonClusterStyle}>
-            {['admin', 'superAdmin'].includes(user.role) && (
+            {['rsoAdmin', 'superAdmin'].includes(user.role) && (
                 <button onClick={() => handleOpenModal('createEvent')} style={createButtonStyle}>Create Event</button>
             )}
             <Modal show={showModal} onClose={handleCloseModal}>

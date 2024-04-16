@@ -306,11 +306,11 @@ BEGIN
 
     -- Determine the user type
     IF is_super_admin > 0 THEN
-        SET user_type = 'Super Admin';
+        SET user_type = 'superAdmin';
     ELSEIF is_rso_admin > 0 THEN
-        SET user_type = 'RSO Admin';
+        SET user_type = 'rsoAdmin';
     ELSEIF is_student > 0 THEN
-        SET user_type = 'Student';
+        SET user_type = 'student';
     ELSE
         SET user_type = 'Unknown';
     END IF;
