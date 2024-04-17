@@ -42,3 +42,9 @@ Queries needed:
 - [ ] 2. Queries for an Event
   - [ ] a. Ratings
   - [ ] b. Comments
+
+university_login
+- [ ] 1. Add university email to UNI table [SQL]
+- [ ] 2. On signup check for uni email (after the @) [database.js]
+-   [ ] a. Add uni to user_info on signup [SQL]
+- [ ] 3. Add user_info creation to signup
