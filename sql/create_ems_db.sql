@@ -236,14 +236,17 @@ END //
 DELIMITER ;
 
 
-CALL insert_user_login('admin@admin.com', 'Password1!');
-CALL insert_user_login('guy1@admin.com', 'Password1!');
-CALL insert_user_login('guy2@admin.com', 'Password1!');
-CALL insert_user_login('guy3@admin.com', 'Password1!');
-CALL validate_user('admin@admin.com', 'Password1!');
+-- Insert test University
+INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu');
 
-CALL insert_user_login('test@test.com', 'Password1!');
-CALL validate_user('test@test.com', 'Password1!');
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL insert_user_login('rso@ucf.edu', 'Password1!');
+CALL insert_user_login('admin@ucf.edu', 'Password1!');
+CALL insert_user_login('guy3@ucf.edu', 'Password1!');
+CALL validate_user('admin@ucf.edu', 'Password1!');
+
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL validate_user('test@ucf.edu', 'Password1!');
 
 use event_management_system;
 DROP PROCEDURE IF EXISTS insert_super_admin;
@@ -305,7 +308,7 @@ END //
 DELIMITER ;
 
 -- Call the procedure
-CALL insert_super_admin('admin@admin.com', 'Admin Name', 'University Name');
+CALL insert_super_admin('admin@ucf.edu', 'Admin Name', 'University Name');
 
 SELECT * FROM SUPER_ADMIN;
 
@@ -425,7 +428,7 @@ DELIMITER //
     BEGIN
 
     DECLARE userID CHAR(255);
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
     CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
 
     SELECT * FROM RSO;
@@ -437,7 +440,7 @@ DELIMITER //
     END //
 DELIMITER ;
 
---call procedure to test the rso creation
+-- call procedure to test the rso creation
 CALL testRSO();
 
 
