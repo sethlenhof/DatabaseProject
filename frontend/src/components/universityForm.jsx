@@ -10,7 +10,7 @@ const UniversityProfileForm = () => {
         location: '',
         description: '',
         numberOfStudents: '',
-        color: '',
+        color: 'white',
     });
 
     const [errors, setErrors] = useState({});
@@ -24,15 +24,33 @@ const UniversityProfileForm = () => {
 
     const validateForm = () => {
         let formErrors = {};
-        if (!universityData.name) formErrors.name = "University name is required.";
-        if (!universityData.location) formErrors.location = "Location is required.";
-        if (!universityData.description) formErrors.description = "Description is required.";
-        if (!universityData.numberOfStudents || isNaN(universityData.numberOfStudents)) {
-            formErrors.numberOfStudents = "Number of students must be a valid number.";
+        if (!universityData.name) {
+            formErrors.name = "University name is required.";
         }
-        window.showToast({title: "Error", message: "Missing fields", type: "error", autoHide: true});
-        setErrors(formErrors);
-        return Object.keys(formErrors).length === 0;
+        if (!universityData.location) {
+            formErrors.location = "Location is required.";
+        }
+        if (!universityData.description) {
+            formErrors.description = "Description is required.";
+        }
+        if (!universityData.numberOfStudents || isNaN(universityData.numberOfStudents)) {
+            formErrors.numberOfStudents = "Must be a valid number.";
+        }
+    
+        setErrors(formErrors); // Update state with the errors found
+    
+        if (Object.keys(formErrors).length > 0) {
+            // Only show the toast if there are errors
+            window.showToast({
+                title: "Error",
+                message: "Please correct the highlighted errors.",
+                type: "error",
+                autoHide: true
+            });
+            return false;
+        }
+    
+        return true; // If no errors, return true indicating form is valid
     };
 
     const handleSubmit = (e) => {
@@ -54,17 +72,22 @@ const UniversityProfileForm = () => {
                     numStudents: universityData.numberOfStudents,
                     color: universityData.color
                 }),
-            }).then((data) => {
-                if (data.status === 200) {
-                    data.json().then((data) => {
-                        console.log("University profile updated successfully!");
-                        window.showToast({title: "Success", message: "University profile updated successfully!", type: "success", autoHide: true});
-                    });
-                } else {
-                    this.setState({ isLoading: false });
-                    console.log("Error fetching user type");
-                    window.showToast({title: "Error", message: "Updating University profile failed", type: "error", autoHide: true});
-                }
+            }).then(data => {
+                console.log("University profile updated successfully!");
+                window.showToast({
+                    title: "Success",
+                    message: "University profile updated successfully!",
+                    type: "success",
+                    autoHide: true
+                });
+            }).catch(error => {
+                console.error("Error updating university profile:", error);
+                window.showToast({
+                    title: "Error",
+                    message: "Updating University profile failed",
+                    type: "error",
+                    autoHide: true
+                });
             });
         }
     };
