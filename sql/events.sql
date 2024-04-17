@@ -35,6 +35,8 @@ DELIMITER ;
 CALL test_get_unapproved_events();
 
 DROP PROCEDURE IF EXISTS approve_event;
+
+-- Procedure to approve an event
 DELIMITER //
 CREATE PROCEDURE approve_event(IN input_super_admin_id CHAR(255), IN input_event_id INT)
 BEGIN
