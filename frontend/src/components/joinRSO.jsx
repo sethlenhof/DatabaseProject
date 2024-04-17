@@ -18,7 +18,7 @@ const JoinRSO = () => {
                 .catch(error => console.error('Error fetching RSO data:', error));
         }
      }, [userId]);
-    //this needs to be made lmao
+
     const handleJoinRSO = (rsoId, rsoName) => {
         fetch('/api/rso/join', {
             method: 'POST',
