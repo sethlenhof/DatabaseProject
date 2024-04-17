@@ -44,11 +44,11 @@ BEGIN
     IF existing_rso_count > 0 THEN
         -- If an RSO with this name exists at the same university, rollback and signal an error
         ROLLBACK;
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'An RSO with this name already exists at your university.');
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'An RSO with this name already exists at your university.');
     ELSEIF existing_user_count = 0 THEN
         -- If user does not exist, rollback and signal an error
         ROLLBACK;
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'User does not exist.');
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'User does not exist.');
     ELSE
         -- Insert new RSO
         INSERT INTO RSO (RSO_NAME, RSO_TYPE, COLOR, RSO_DESCRIPTION, UNIVERSITY_ID)
@@ -68,11 +68,11 @@ BEGIN
 
             -- Commit the transaction if all operations were successful
             COMMIT;
-            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('SUCCESS', 'RSO created successfully.');
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'RSO created successfully.');
         ELSE
             -- Rollback if an admin already exists
             ROLLBACK;
-            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'An admin already exists for this RSO.');
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'An admin already exists for this RSO.');
         END IF;
     END IF;
     SELECT * FROM RESPONSE;
