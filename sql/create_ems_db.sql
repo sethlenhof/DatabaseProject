@@ -394,6 +394,7 @@ DELIMITER //
     BEGIN
 
     DECLARE userID CHAR(255);
+    -- to test different user, update this email
     SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
     CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
 
