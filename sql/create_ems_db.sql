@@ -239,8 +239,6 @@ BEGIN
     SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = admin_email;
     IF userID IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: User ID is null after selection.';
-    ELSE
-        SELECT 'User ID retrieved successfully', userID;
     END IF;
 
      -- Check if a super admin entry already exists for this userID
@@ -331,7 +329,22 @@ BEGIN
 END //
 DELIMITER ;
 
-CALL update_university_info(userID, 'New University Name', 'New Location', 'New Description', 1000, 'blue');
+-- create test procedure for updating university info
+DELIMITER //
+CREATE PROCEDURE testUpdateUniversity()
+BEGIN
+    DECLARE userID CHAR(255);
+    -- to test different user, update this email
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    CALL update_university_info(userID, 'New University Name', 'New Location', 'New Description', 1000, 'blue');
+    SELECT * FROM UNIVERSITY;
+    CALL update_university_info(userID, 'New Name', 'IDK Location', 'New Description', 1000, 'blue');
+
+END //
+DELIMITER ;
+
+-- Call the procedure
+CALL testUpdateUniversity();
 
 
 -- PROCEDURE TO FIND USER TYPE
