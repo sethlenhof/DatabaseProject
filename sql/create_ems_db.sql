@@ -486,7 +486,7 @@ CALL testRSO();
 
 -- procedure to get RSOs available from user university
 DELIMITER //
-CREATE PROCEDURE get_rso(IN input_user_id CHAR(255))
+CREATE PROCEDURE get_rsos(IN input_user_id CHAR(255))
 BEGIN
     DECLARE uni_id INT;
 
@@ -503,7 +503,7 @@ BEGIN
     DECLARE userID CHAR(255);
     -- to test different user, update this email
     SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
-    CALL get_rso(userID);
+    CALL get_rsos(userID);
 END //
 DELIMITER ;
 

@@ -172,6 +172,37 @@ app.post("/api/updateUniversityInfo", (req, res) => {
 	});
 });
 
+// *===========================================================*
+// |               		GET RSOs API       			           |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status, rsos }
+app.get("/api/rsos", (req, res) => {
+	const { userId } = req.query;
+	if (!userId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId });
+
+	const sql = "CALL get_rsos(?)";
+	const params = [data.userId];
+	db.query(sql, params, function (err, results) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({ rsos: response });
+	});
+});
+
+
 // sanitizeData function to sanitize input data
 // prevent SQL injection
 function sanitizeData(data) {
