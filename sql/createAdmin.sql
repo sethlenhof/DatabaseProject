@@ -21,6 +21,11 @@ BEGIN
     DECLARE existing_rso_count INT;
     DECLARE existing_user_count INT;
 
+        CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+    
     -- Check if an RSO with the same name already exists
     SELECT COUNT(*) INTO existing_rso_count FROM RSO WHERE RSO_NAME = rso_name;
 
@@ -30,11 +35,11 @@ BEGIN
     IF existing_rso_count > 0 THEN
         -- If an RSO with this name exists, rollback and signal an error
         ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'An RSO with this name already exists.';
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'An RSO with this name already exists.');
     ELSEIF existing_user_count = 0 THEN
         -- If user does not exist, rollback and signal an error
         ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: User ID does not exist in USER_INFO.';
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'User does not exist.');
     ELSE
         -- Insert new RSO
         INSERT INTO RSO (RSO_NAME, COLOR, RSO_DESCRIPTION)
@@ -54,34 +59,38 @@ BEGIN
 
             -- Commit the transaction if all operations were successful
             COMMIT;
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('SUCCESS', 'RSO created successfully.');
         ELSE
             -- Rollback if an admin already exists
             ROLLBACK;
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'An admin already exists for this RSO.';
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'An admin already exists for this RSO.');
         END IF;
     END IF;
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
 END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS testRSO;
--- Call the procedure using a test user
+
+
+-- Call the procedure using a admin user
 DELIMITER //
     CREATE PROCEDURE testRSO()
     BEGIN
 
     DECLARE userID CHAR(255);
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'test@test.com';
-    CALL create_rso_and_admin(userID, 'RSO Name', 'RSO Color', 'RSO Description');
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
 
     SELECT * FROM RSO;
     SELECT * FROM RSO_ADMIN;
     SELECT * FROM STUDENT;
 
     -- Call the procedure again to see the error message
-    CALL create_rso_and_admin(userID, 'FUCK', 'RSO Color', 'RSO Description');
+    CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
     END //
 DELIMITER ;
 
-CALL create_rso_and_admin('d474223c-fbb8-11ee-a9fa-00155d00f503', 'res', 'RSO Color', 'RSO Description');
-
--- CALL testRSO();
+--call procedure to test the rso creation
+CALL testRSO();
