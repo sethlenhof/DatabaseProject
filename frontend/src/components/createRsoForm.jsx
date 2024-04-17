@@ -1,14 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "./button.jsx";
 import { FormField } from './formField.jsx';
 
 const CreateRso = () => {
-    const id = localStorage.getItem('id');
+    const id = localStorage.getItem('user');
 
-    const [name, setName] = React.useState("");
-    const [type, setType] = React.useState("");
-    const [description, setDescription] = React.useState("");
-    const [members, setMembers] = React.useState("");
+    const [rsoData, setRsoData] = useState({
+        name: '',
+        type: '',
+        description: '',
+        color: 'white',
+    });
+
+    const handleChange = (e) => {
+        setRsoData({
+            ...rsoData,
+            [e.target.name]: e.target.value
+        });
+    };
 
     const inputStyle = {
         padding: '10px',
@@ -45,8 +54,39 @@ const CreateRso = () => {
         borderBottom: '2px solid #ccc'
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        fetch("/api/rsos/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userId: id,
+                    name: rsoData.name,
+                    type: rsoData.type,
+                    description: rsoData.description,
+                    color: rsoData.color,
+                }),
+            }).then(data => {
+                if (data.status === 200) {
+                    window.showToast({
+                        title: "Success",
+                        message: "RSO Created successfully!",
+                        type: "success",
+                        autoHide: true
+                    });
+                }else{
+                    data.json().then(data => {
+                    window.showToast({
+                        title: "Error", message: data.error, type: "error", autoHide: true});
+                    });
+                }
+                
+            });
+    };
+
     return (
-        <form style={formStyle}>
+        <form style={formStyle} onSubmit={handleSubmit}>
             <h1 style={headerStyle}>Create Registered Student Organization</h1>
             <FormField label="Name:">
                 <input
@@ -54,16 +94,16 @@ const CreateRso = () => {
                     type="text"
                     name="name"
                     placeholder="Enter RSO Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={rsoData.name}
+                    onChange={handleChange}
                 />
             </FormField>
             <FormField label="Type:">
                 <select
                     style={selectStyle}
                     name="type"
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
+                    value={rsoData.type}
+                    onChange={handleChange}
                 >
                     <option value="">Select Type</option>
                     <option value="Fraternity">Fraternity</option>
@@ -76,8 +116,8 @@ const CreateRso = () => {
                     style={{...inputStyle, minHeight: '100px', resize: 'vertical'}}
                     name="description"
                     placeholder="RSO Description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={rsoData.description}
+                    onChange={handleChange}
                 />
             </FormField>
             <FormField label="Members:">
@@ -85,11 +125,20 @@ const CreateRso = () => {
                     style={{...inputStyle, minHeight: '100px', resize: 'vertical'}}
                     name="members"
                     placeholder="Enter Member Emails (comma separated)"
-                    value={members}
-                    onChange={(e) => setMembers(e.target.value)}
+                    value={rsoData.members}
+                    onChange={handleChange}
                 />
             </FormField>
-            <Button onClick={() => console.log('Form submitted')}>Submit</Button>
+            <FormField label="Color:">
+                    <input
+                        type="color"
+                        name="color"
+                        value={rsoData.color}
+                        onChange={handleChange}
+                        style={inputStyle}
+                    />
+            </FormField>
+            <Button type="submit">Create RSO</Button>
         </form>
     );
 };

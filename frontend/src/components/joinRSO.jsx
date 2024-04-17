@@ -19,7 +19,7 @@ const JoinRSO = () => {
         }
      }, [userId]);
     //this needs to be made lmao
-    const joinRSO = (rsoId, rsoName) => {
+    const handleJoinRSO = (rsoId, rsoName) => {
         fetch('/api/rso/join', {
             method: 'POST',
             headers: {
@@ -77,7 +77,7 @@ const JoinRSO = () => {
                 }}>
                     <h4>{rso.RSO_NAME}</h4>
                     <p>{rso.RSO_DESCRIPTION}</p>
-                    <Button onClick={() => joinRSO(rso.RSO_ID, rso.RSO_NAME)}>
+                    <Button onClick={() => handleJoinRSO(rso.RSO_ID, rso.RSO_NAME)}>
                         Join
                     </Button>
                 </div>
