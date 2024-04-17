@@ -1,23 +1,23 @@
 USE event_management_system;
 
 -- Inserting sample universities
-INSERT INTO UNIVERSITY (NAME, LOCATION, DESCRIPTION, NUM_OF_STUDENTS) VALUES 
+INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNI_DESCRIPTION, NUM_OF_STUDENTS) VALUES 
 ('Tech University', 'Tech City', 'A leading university in technology.', 10000),
 ('Humanities University', 'Humanities City', 'A leading university in humanities.', 8000);
 
 -- Inserting sample RSOs
-INSERT INTO RSO (NAME, DESCRIPTION) VALUES 
+INSERT INTO RSO (RSO_NAME, RSO_DESCRIPTION) VALUES 
 ('Tech Club', 'A club for tech enthusiasts.'),
 ('Literature Society', 'A society for lovers of literature.');
 
 -- Inserting sample users
-INSERT INTO USER_LOGIN (EMAIL, PASS) VALUES 
-('john.doe@example.com', SHA2('password123', 256)),
-('jane.smith@example.com', SHA2('password456', 256));
+INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES 
+(1, 'john.doe@example.com', SHA2('password123', 256)),
+(2, 'jane.smith@example.com', SHA2('password456', 256));
 
-INSERT INTO USER_INFO (NAME, UNIVERSITY_ID) VALUES 
-('John Doe', 1),
-('Jane Smith', 2);
+INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID) VALUES 
+(1, 'John Doe', 1),
+(2, 'Jane Smith', 2);
 
 -- Assigning users to RSOs and roles
 INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES 
