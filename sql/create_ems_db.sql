@@ -36,6 +36,7 @@ CREATE TABLE UNIVERSITY (
     UNIVERSITY_ID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     UNIVERSITY_NAME VARCHAR(255),
     UNIVERSITY_LOCATION VARCHAR(255),
+    UNIVERSITY_EMAIL VARCHAR(255) UNIQUE,
     UNI_DESCRIPTION TEXT,
     NUM_OF_STUDENTS INT,
     COLOR VARCHAR(255)
@@ -109,14 +110,20 @@ CREATE TABLE COMMENT (
 );
 
 
+
+-- ||===================================================================================================||
+-- ||                                     INSERT USER_LOGIN                                             ||              
+-- ||===================================================================================================||
 DELIMITER //
--- INSERT USER_LOGIN
 CREATE PROCEDURE insert_user_login(IN input_email VARCHAR(255), IN input_pass VARCHAR(255))
 BEGIN
     -- Check if the email already exists
     DECLARE emailExists INT;
     DECLARE passLength INT;
     DECLARE userGUID CHAR(255);
+    DECLARE UNI_ID INT;
+    DECLARE UNI_EXISTS INT;
+    DECLARE emailDomain VARCHAR(255);
 
     SET userGUID = UUID();
     
@@ -129,21 +136,40 @@ BEGIN
     SELECT COUNT(*) INTO emailExists FROM USER_LOGIN WHERE EMAIL = input_email;
     SELECT LENGTH(input_pass) INTO passLength;
 
+    -- Get the email domain from the email (e.g. gmail.com, yahoo.com)
+    SET emailDomain = SUBSTRING_INDEX(input_email, '@', -1);
+    -- Check if the email domain is a university
+    SELECT COUNT(*) INTO UNI_EXISTS FROM UNIVERSITY WHERE UNIVERSITY_EMAIL = emailDomain;
+
+
+
     -- Insert the new user only if the email does not exist
     IF emailExists > 0 THEN
         INSERT INTO RESPONSE VALUES ('Error', 'duplicateEmail');
     ELSEIF passLength < 8 THEN
         INSERT INTO RESPONSE VALUES ('Error', 'invalidPass');
+    ELSEIF UNI_EXISTS = 0 THEN
+        INSERT INTO RESPONSE VALUES ('Error', 'invalidUniversityEmail');
     ELSE
         -- Insert the new user if the email does not exist
         INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES (userGUID, input_email, SHA2(input_pass, 256));
         INSERT INTO RESPONSE VALUES ('Success', CONCAT('User added ', userGUID));
+        
+        -- Get the university ID
+        SELECT UNIVERSITY_ID INTO UNI_ID FROM UNIVERSITY WHERE UNIVERSITY_EMAIL = emailDomain;
+
+        -- Insert the user into the USER_INFO table
+        INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID) VALUES (userGUID, 'New User', UNI_ID);
     END IF;
     SELECT * FROM RESPONSE;
     DROP TEMPORARY TABLE RESPONSE;
 END //
 
 DELIMITER ;
+
+-- ||===================================================================================================||
+-- ||                                       VALIDATE_USER                                               ||              
+-- ||===================================================================================================||
 
 DELIMITER //
 CREATE PROCEDURE validate_user(IN input_email VARCHAR(255), IN input_pass VARCHAR(255))
@@ -172,7 +198,7 @@ DELIMITER ;
 
 -- Find RSO events for user
 DELIMITER //
-CREATE PROCEDURE find_RSO_event(IN input_user_id INT)
+CREATE PROCEDURE find_RSO_events(IN input_user_id INT)
 BEGIN
     -- select all events for the RSOs that the user is a part of
     SELECT * FROM EVENTS WHERE RSO_ID IN (SELECT RSO_ID FROM STUDENT WHERE USER_ID = input_user_id);
@@ -188,6 +214,7 @@ BEGIN
 END //
 DELIMITER ;
 
+
 -- find public events for user (where there is no RSO and no University)
 DELIMITER //
 CREATE PROCEDURE find_public_events()
@@ -196,85 +223,59 @@ BEGIN
     SELECT * FROM EVENTS WHERE UNIVERSITY_ID IS NULL AND RSO_ID IS NULL;
 END //
 
+
 -- find all events for user
 DELIMITER //
 CREATE PROCEDURE find_all_events(IN input_user_id INT)
 BEGIN
     -- select all events for the user, calling other procedures
-    CALL find_RSO_even(input_user_id);
+    CALL find_RSO_events(input_user_id);
     CALL find_private_events(input_user_id);
     CALL find_public_events();
 END //
 DELIMITER ;
 
 
-CALL insert_user_login('admin@admin.com', 'Password1!');
-CALL validate_user('admin@admin.com', 'Password1!');
 
-CALL insert_user_login('test@test.com', 'Password1!');
-CALL validate_user('test@test.com', 'Password1!');
-
-use event_management_system;
-DROP PROCEDURE IF EXISTS insert_super_admin;
-
+-- procedure to insert a super admin
 DELIMITER //
 CREATE PROCEDURE insert_super_admin(
     IN admin_email VARCHAR(255),
     IN admin_name VARCHAR(255),
-    IN university_name VARCHAR(255) -- Placeholder name
+    IN admin_pass VARCHAR(255),
+    IN university_name VARCHAR(255)
 )
 BEGIN
     DECLARE userID CHAR(255);
     DECLARE uni_id INT;
-    DECLARE user_exists INT DEFAULT 0;
-    DECLARE super_admin_exists INT DEFAULT 0;
-
-    -- Check if user exists in USER_LOGIN and retrieve userID
-    SELECT COUNT(*) INTO user_exists FROM USER_LOGIN WHERE EMAIL = admin_email;
-    IF user_exists = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: No user found with the specified email';
+    DECLARE emailDomain VARCHAR(255);
+    set userID = UUID();
+    
+    -- Grabbing domain 
+    SET emailDomain = SUBSTRING_INDEX(admin_email, '@', -1);
+    -- Search for domain in university table
+    SELECT UNIVERSITY_ID INTO uni_id FROM UNIVERSITY WHERE UNIVERSITY_EMAIL = emailDomain;
+    -- if found, return error
+    IF uni_id IS NOT NULL THEN
+        SELECT 'Error: University already exists with this email domain';
+        ROLLBACK;
     END IF;
-
-    -- Retrieve userID
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = admin_email;
-    IF userID IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: User ID is null after selection.';
-    END IF;
-
-     -- Check if a super admin entry already exists for this userID
-    SELECT COUNT(*) INTO super_admin_exists FROM SUPER_ADMIN WHERE USER_ID = userID;
-    IF super_admin_exists > 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: A super admin entry already exists for this user';
-    END IF;
-
     START TRANSACTION;
 
-    -- Insert the new university with minimal initial data
-    INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNI_DESCRIPTION, NUM_OF_STUDENTS, COLOR)
-    VALUES (university_name, NULL, NULL, NULL, NULL);
-
+    -- Create University with same email domain as admin email
+    -- Insert into University table
+    INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_EMAIL) VALUES (university_name, emailDomain);
     -- Get the last inserted university ID
     SET uni_id = LAST_INSERT_ID();
 
-    -- Insert or update user info
-    INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID)
-    VALUES (userID, admin_name, uni_id)
-    ON DUPLICATE KEY UPDATE USERS_NAME = VALUES(USERS_NAME), UNIVERSITY_ID = VALUES(UNIVERSITY_ID);
-
-    -- Insert into SUPER_ADMIN table
-    INSERT INTO SUPER_ADMIN (USER_ID, UNIVERSITY_ID)
-    VALUES (userID, uni_id)
-    ON DUPLICATE KEY UPDATE UNIVERSITY_ID = VALUES(UNIVERSITY_ID);
+    INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES (userID, admin_email, SHA2(admin_pass, 256));
+    INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID) VALUES (userID, admin_name, uni_id);
+    INSERT INTO SUPER_ADMIN (USER_ID, UNIVERSITY_ID) VALUES (userID, uni_id);
 
     COMMIT;
 END //
 DELIMITER ;
 
--- Call the procedure
-CALL insert_super_admin('admin@admin.com', 'Admin Name', 'University Name');
-
-SELECT * FROM SUPER_ADMIN;
-SELECT * FROM UNIVERSITY;
 
 
 -- PROCEDURE TO UPDATE UNIVERSITY INFO
@@ -335,7 +336,7 @@ CREATE PROCEDURE testUpdateUniversity()
 BEGIN
     DECLARE userID CHAR(255);
     -- to test different user, update this email
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
     CALL update_university_info(userID, 'New University Name', 'New Location', 'New Description', 1000, 'blue');
     SELECT * FROM UNIVERSITY;
     CALL update_university_info(userID, 'New Name', 'IDK Location', 'New Description', 1000, 'blue');
@@ -343,8 +344,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Call the procedure
-CALL testUpdateUniversity();
 
 
 -- PROCEDURE TO FIND USER TYPE
@@ -462,8 +461,8 @@ DELIMITER //
     BEGIN
 
     DECLARE userID CHAR(255);
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
     -- to test different user, update this email
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
     CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
 
     SELECT * FROM RSO;
@@ -475,15 +474,37 @@ DELIMITER //
     END //
 DELIMITER ;
 
+
+
+-- Insert test super admin (admin@ucf.edu 'James D. Taiclet' 'Password1!' University of Central Florida)
+CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'University of Central Florida');
+
+-- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
+
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL insert_user_login('rso@ucf.edu', 'Password1!');
+-- CALL insert_user_login('admin@ucf.edu', 'Password1!');
+CALL insert_user_login('guy3@ucf.edu', 'Password1!');
+-- CALL validate_user('admin@ucf.edu', 'Password1!');
+
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL validate_user('test@ucf.edu', 'Password1!');
+
+
+SELECT * FROM SUPER_ADMIN;
+SELECT * FROM UNIVERSITY;
+
+-- Call the procedure
+CALL testUpdateUniversity();
+
+-- call procedure to test the rso creation
 -- call procedure to test the rso creation
 CALL testRSO();
 
-
-
 -- TO DO:
--- 1. Update procedure for sign up to include user info and set as student
--- 2. update sign up endpoint to call the updated procedure
+-- X 1. Update procedure for sign up to include user info and set as student 
+-- X 2. update sign up endpoint to call the updated procedure
 -- 3. Update front end to include user info
--- 4. make logic where if user is super admin, their email prefix is used to identify students
--- 5. use this in endpoint to set student university
--- OR make it so a user registers as a student at a university and then can create an RSO at that school
+-- X (But for all users) 4. make logic where if user is super admin, their email prefix is used to identify students
+-- X 5. use this in endpoint to set student university
+-- X OR make it so a user registers as a student at a university and then can create an RSO at that school

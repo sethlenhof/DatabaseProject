@@ -43,6 +43,11 @@ Queries needed:
   - [ ] a. Ratings
   - [ ] b. Comments
 
+university_login
+- [x] 1. Add university email to UNI table [SQL]
+- [x] 2. On signup check for uni email (after the @) [SQL]
+-   [x] a. Add uni to user_info on signup [SQL]
+- [x] 3. Add user_info creation to signup [SQL]
 
 
 TO DO UPDATED:
