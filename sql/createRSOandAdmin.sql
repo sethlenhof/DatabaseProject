@@ -94,3 +94,29 @@ DELIMITER ;
 
 --call procedure to test the rso creation
 CALL testRSO();
+
+-- procedure to get RSOs available from user university
+DELIMITER //
+CREATE PROCEDURE get_rso(IN input_user_id CHAR(255))
+BEGIN
+    DECLARE uni_id INT;
+
+    SELECT UNIVERSITY_ID INTO uni_id FROM USER_INFO WHERE USER_ID = input_user_id;
+
+    SELECT * FROM RSO WHERE UNIVERSITY_ID = uni_id;
+END //
+DELIMITER ;
+
+-- test procedure to get RSOs
+DELIMITER //
+CREATE PROCEDURE testGetRSO()
+BEGIN
+    DECLARE userID CHAR(255);
+    -- to test different user, update this email
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    CALL get_rso(userID);
+END //
+DELIMITER ;
+
+-- call procedure to test the rso creation
+CALL testGetRSO();

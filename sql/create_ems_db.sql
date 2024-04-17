@@ -45,7 +45,9 @@ CREATE TABLE RSO (
     RSO_ID INT AUTO_INCREMENT PRIMARY KEY,
     RSO_NAME VARCHAR(255),
     COLOR VARCHAR(255),
-    RSO_DESCRIPTION TEXT
+    RSO_DESCRIPTION TEXT,
+    UNIVERSITY_ID INT,
+    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
 );
 
 CREATE TABLE USER_INFO (
@@ -405,6 +407,7 @@ BEGIN
     DECLARE existing_admin_count INT;
     DECLARE existing_rso_count INT;
     DECLARE existing_user_count INT;
+    DECLARE user_uni_id INT;
 
         CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
         RESPONSE_STATUS VARCHAR(20),
@@ -413,6 +416,9 @@ BEGIN
     
     -- Check if an RSO with the same name already exists
     SELECT COUNT(*) INTO existing_rso_count FROM RSO WHERE RSO_NAME = rso_name;
+
+    -- get user university id
+    SELECT UNIVERSITY_ID INTO user_uni_id FROM USER_INFO WHERE USER_ID = input_user_id;
 
     -- Start the transaction here to ensure all following operations are atomic
     START TRANSACTION;
@@ -427,8 +433,8 @@ BEGIN
         INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'User does not exist.');
     ELSE
         -- Insert new RSO
-        INSERT INTO RSO (RSO_NAME, COLOR, RSO_DESCRIPTION)
-        VALUES (rso_name, rso_color, rso_description);
+        INSERT INTO RSO (RSO_NAME, COLOR, RSO_DESCRIPTION, UNIVERSITY_ID)
+        VALUES (rso_name, rso_color, rso_description, user_uni_id);
 
         -- Capture the RSO_ID of the newly created RSO
         SET new_rso_id = LAST_INSERT_ID();
@@ -478,7 +484,31 @@ DELIMITER ;
 -- call procedure to test the rso creation
 CALL testRSO();
 
+-- procedure to get RSOs available from user university
+DELIMITER //
+CREATE PROCEDURE get_rso(IN input_user_id CHAR(255))
+BEGIN
+    DECLARE uni_id INT;
 
+    SELECT UNIVERSITY_ID INTO uni_id FROM USER_INFO WHERE USER_ID = input_user_id;
+
+    SELECT * FROM RSO WHERE UNIVERSITY_ID = uni_id;
+END //
+DELIMITER ;
+
+-- test procedure to get RSOs
+DELIMITER //
+CREATE PROCEDURE testGetRSO()
+BEGIN
+    DECLARE userID CHAR(255);
+    -- to test different user, update this email
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    CALL get_rso(userID);
+END //
+DELIMITER ;
+
+-- call procedure to test the rso creation
+CALL testGetRSO();
 
 -- TO DO:
 -- 1. Update procedure for sign up to include user info and set as student
