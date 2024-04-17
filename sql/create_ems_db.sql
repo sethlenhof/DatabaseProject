@@ -86,9 +86,14 @@ CREATE TABLE SUPER_ADMIN (
 
 CREATE TABLE EVENTS (
     EVENT_ID INT AUTO_INCREMENT PRIMARY KEY,
+    EVENT_NAME VARCHAR(255),
+    CATEGORY VARCHAR(255),
+    EVENT_DESCRIPTION TEXT,
+    EVENT_LOCATION VARCHAR(255),
+    CONTACT_PHONE VARCHAR(255),
+    CONTACT_EMAIL VARCHAR(255),
     RSO_ID INT,
     UNIVERSITY_ID INT,
-    EVENT_LOCATION VARCHAR(255),
     EVENT_START VARCHAR(255),
     EVENT_END VARCHAR(255),
     FOREIGN KEY (RSO_ID) REFERENCES RSO(RSO_ID),
@@ -238,6 +243,45 @@ BEGIN
     CALL find_public_events();
 END //
 DELIMITER ;
+
+-- find RSO admin of
+DELIMITER //
+CREATE PROCEDURE get_rso_admin_membership(IN input_user_id CHAR(255))
+BEGIN
+    SELECT RSO.RSO_ID
+    FROM RSO
+    INNER JOIN RSO_ADMIN ON RSO.RSO_ID = RSO_ADMIN.RSO_ID
+    WHERE RSO_ADMIN.USER_ID = input_user_id;
+END //
+
+DELIMITER ;
+
+
+-- create event
+DELIMITER //
+
+CREATE PROCEDURE insert_event(
+    IN p_rso_id INT,
+    IN p_university_id INT,
+    IN p_name VARCHAR(255),
+    IN p_category VARCHAR(255),
+    IN p_description TEXT,
+    IN p_event_start VARCHAR(255),
+    IN p_event_end VARCHAR(255),
+    IN p_location VARCHAR(255),
+    IN p_contact_phone VARCHAR(255),
+    IN p_contact_email VARCHAR(255)
+)
+BEGIN
+    INSERT INTO EVENTS (RSO_ID, UNIVERSITY_ID, EVENT_NAME, CATEGORY, EVENT_DESCRIPTION, EVENT_START, EVENT_END, EVENT_LOCATION, CONTACT_PHONE, CONTACT_EMAIL)
+    VALUES (p_rso_id, p_university_id, p_name, p_category, p_description, p_event_start, p_event_end, p_location, p_contact_phone, p_contact_email);
+
+    -- respond with success
+    SELECT 'Success: Event created';
+END //
+
+DELIMITER ;
+
 
 
 
@@ -493,32 +537,6 @@ DELIMITER //
 DELIMITER ;
 
 
-
--- Insert test super admin (admin@ucf.edu 'James D. Taiclet' 'Password1!' University of Central Florida)
-CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'University of Central Florida');
-
--- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
-
-CALL insert_user_login('test@ucf.edu', 'Password1!');
-CALL insert_user_login('rso@ucf.edu', 'Password1!');
--- CALL insert_user_login('admin@ucf.edu', 'Password1!');
-CALL insert_user_login('guy3@ucf.edu', 'Password1!');
--- CALL validate_user('admin@ucf.edu', 'Password1!');
-
-CALL insert_user_login('test@ucf.edu', 'Password1!');
-CALL validate_user('test@ucf.edu', 'Password1!');
-
-
-SELECT * FROM SUPER_ADMIN;
-SELECT * FROM UNIVERSITY;
-
--- Call the procedure
-CALL testUpdateUniversity();
-
--- call procedure to test the rso creation
--- call procedure to test the rso creation
-CALL testRSO();
-
 -- procedure to get RSOs available from user university
 DELIMITER //
 CREATE PROCEDURE get_rsos(IN input_user_id CHAR(255))
@@ -542,8 +560,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- call procedure to test the rso creation
-CALL testGetRSO();
 
 -- procedure to join RSO
 DELIMITER //
@@ -601,8 +617,43 @@ BEGIN
 END //
 DELIMITER ;
 
+
+-- Insert test super admin (admin@ucf.edu 'James D. Taiclet' 'Password1!' University of Central Florida)
+CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'University of Central Florida');
+
+-- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
+
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL insert_user_login('rso@ucf.edu', 'Password1!');
+-- CALL insert_user_login('admin@ucf.edu', 'Password1!');
+CALL insert_user_login('guy3@ucf.edu', 'Password1!');
+-- CALL validate_user('admin@ucf.edu', 'Password1!');
+
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL validate_user('test@ucf.edu', 'Password1!');
+
+
+SELECT * FROM SUPER_ADMIN;
+SELECT * FROM UNIVERSITY;
+
+-- Call the procedure
+CALL testUpdateUniversity();
+
+-- call procedure to test the rso creation
+-- call procedure to test the rso creation
+CALL testRSO();
+
+-- call procedure to test the rso creation
+CALL testGetRSO();
+
 -- call procedure to test the rso creation
 CALL testJoinRSO();
+
+-- insert event params: (p_rso_id INT, p_university_id INT, p_name VARCHAR(255), p_category VARCHAR(255), p_description TEXT, p_event_start VARCHAR(255), p_event_end VARCHAR(255), p_location VARCHAR(255), p_contact_phone VARCHAR(255), p_contact_email VARCHAR(255))
+CALL insert_event(1, 1, 'UCF Event', 'Education', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+-- SELECT ALL EVENTS
+SELECT * FROM EVENTS;
 
 -- TO DO:
 -- X 1. Update procedure for sign up to include user info and set as student 
