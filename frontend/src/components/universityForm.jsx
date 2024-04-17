@@ -4,11 +4,13 @@ import { FormField } from './formField.jsx';
 import ErrorMessage from './errorMessage.jsx';
 
 const UniversityProfileForm = () => {
+    // const { userId, name, location, description, numStudents, color } = req.body;
     const [universityData, setUniversityData] = useState({
         name: '',
         location: '',
         description: '',
-        numberOfStudents: ''
+        numberOfStudents: '',
+        color: '',
     });
 
     const [errors, setErrors] = useState({});
@@ -28,7 +30,7 @@ const UniversityProfileForm = () => {
         if (!universityData.numberOfStudents || isNaN(universityData.numberOfStudents)) {
             formErrors.numberOfStudents = "Number of students must be a valid number.";
         }
-
+        window.showToast({title: "Error", message: "Missing fields", type: "error", autoHide: true});
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     };
@@ -38,6 +40,32 @@ const UniversityProfileForm = () => {
         if (validateForm()) {
             console.log('Submitting university profile:', universityData);
             // Here you might send data to a server or another handler function
+            const url = '/api/updateUniversityInfo';
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    userId: localStorage.getItem("user"),
+                    name: universityData.name,
+                    location: universityData.location,
+                    description: universityData.description,
+                    numStudents: universityData.numberOfStudents,
+                    color: universityData.color
+                }),
+            }).then((data) => {
+                if (data.status === 200) {
+                    data.json().then((data) => {
+                        console.log("University profile updated successfully!");
+                        window.showToast({title: "Success", message: "University profile updated successfully!", type: "success", autoHide: true});
+                    });
+                } else {
+                    this.setState({ isLoading: false });
+                    console.log("Error fetching user type");
+                    window.showToast({title: "Error", message: "Updating University profile failed", type: "error", autoHide: true});
+                }
+            });
         }
     };
 
@@ -116,6 +144,15 @@ const UniversityProfileForm = () => {
                         style={inputStyle}
                     />
                     {errors.numberOfStudents && <ErrorMessage error={errors.numberOfStudents} />}
+                </FormField>
+                <FormField label="Color:">
+                    <input
+                        type="color"
+                        name="color"
+                        value={universityData.color}
+                        onChange={handleChange}
+                        style={inputStyle}
+                    />
                 </FormField>
                 <Button type="submit">Submit Profile</Button>
             </form>
