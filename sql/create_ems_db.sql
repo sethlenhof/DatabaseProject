@@ -474,9 +474,7 @@ DELIMITER //
     END //
 DELIMITER ;
 
--- call procedure to test the rso creation
--- call procedure to test the rso creation
-CALL testRSO();
+
 
 -- Insert test super admin (admin@ucf.edu 'James D. Taiclet' 'Password1!' University of Central Florida)
 CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'University of Central Florida');
@@ -498,6 +496,10 @@ SELECT * FROM UNIVERSITY;
 
 -- Call the procedure
 CALL testUpdateUniversity();
+
+-- call procedure to test the rso creation
+-- call procedure to test the rso creation
+CALL testRSO();
 
 -- TO DO:
 -- X 1. Update procedure for sign up to include user info and set as student 
