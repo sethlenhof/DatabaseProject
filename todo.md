@@ -5,7 +5,7 @@
 - [x] 3. Create main landing page: shows all events
 - [ ] 4. Research showing data from events.ucf
 - [ ] 5. Add additional info for different users
-  - [] a. Super admin: create profile for university
+  - [X] a. Super admin: create profile for university
     - Name, location, num students, pictures, etc
   - [ ] b. Admin: create events, owns an RSO with a university
   - [ ] c. Student: can join RSOs, attend events
