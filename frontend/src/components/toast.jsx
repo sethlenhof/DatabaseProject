@@ -78,7 +78,7 @@ const ToastContainer = () => {
     }, []);
 
     return (
-        <div style={{ position: 'fixed', top: '20px', right: '20px' }}>
+        <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: '100' }}>
             {toasts.map((toast, index) => (
                 <Toast
                     key={toast.id}
