@@ -73,21 +73,20 @@ const UniversityProfileForm = () => {
                     color: universityData.color
                 }),
             }).then(data => {
-                console.log("University profile updated successfully!");
-                window.showToast({
-                    title: "Success",
-                    message: "University profile updated successfully!",
-                    type: "success",
-                    autoHide: true
-                });
-            }).catch(error => {
-                console.error("Error updating university profile:", error);
-                window.showToast({
-                    title: "Error",
-                    message: "Updating University profile failed",
-                    type: "error",
-                    autoHide: true
-                });
+                if (data.status === 200) {
+                    window.showToast({
+                        title: "Success",
+                        message: "University profile updated successfully!",
+                        type: "success",
+                        autoHide: true
+                    });
+                }else{
+                    data.json().then(data => {
+                    window.showToast({
+                        title: "Error", message: data.error, type: "error", autoHide: true});
+                    });
+                }
+                
             });
         }
     };
