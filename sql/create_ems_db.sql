@@ -249,17 +249,17 @@ BEGIN
     DECLARE userID CHAR(255);
     DECLARE uni_id INT;
     DECLARE emailDomain VARCHAR(255);
+    set userID = UUID();
     
     -- Grabbing domain 
     SET emailDomain = SUBSTRING_INDEX(admin_email, '@', -1);
     -- Search for domain in university table
     SELECT UNIVERSITY_ID INTO uni_id FROM UNIVERSITY WHERE UNIVERSITY_EMAIL = emailDomain;
     -- if found, return error
-    -- IF uni_id IS NOT NULL THEN
-    --     SELECT 'Error: University already exists with this email domain';
-    --     RETURN;
-    -- END IF;
-    set userID = UUID();
+    IF uni_id IS NOT NULL THEN
+        SELECT 'Error: University already exists with this email domain';
+        ROLLBACK;
+    END IF;
     START TRANSACTION;
 
     -- Create University with same email domain as admin email
