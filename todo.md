@@ -67,8 +67,8 @@ TO DO UPDATED:
   -[ ] a. GET to determine RSO(S)
   -[ ] b. Add dropdown and adjust form as needed if multiple RSOs
   -[ ] c. Ensure form has all fields needed, adjust to match db
-  -[ ] d. Create procedure to add event given a USERID, RSO/UNI id
-  -[ ] e. Create post endpoint to add event
+  -[X] d. Create procedure to add event given a USERID, RSO/UNI id
+  -[X] e. Create post endpoint to add event
   -[ ] f. Wire to front end, show toasts
 
 - [ ] 4. Get events
