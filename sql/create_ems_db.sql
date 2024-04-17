@@ -236,19 +236,6 @@ END //
 DELIMITER ;
 
 
--- Insert test super admin (admin@ucf.edu 'James D. Taiclet' 'Password1!' University of Central Florida)
-CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'University of Central Florida');
-
--- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
-
-CALL insert_user_login('test@ucf.edu', 'Password1!');
-CALL insert_user_login('rso@ucf.edu', 'Password1!');
--- CALL insert_user_login('admin@ucf.edu', 'Password1!');
-CALL insert_user_login('guy3@ucf.edu', 'Password1!');
--- CALL validate_user('admin@ucf.edu', 'Password1!');
-
-CALL insert_user_login('test@ucf.edu', 'Password1!');
-CALL validate_user('test@ucf.edu', 'Password1!');
 
 -- procedure to insert a super admin
 DELIMITER //
@@ -261,16 +248,17 @@ CREATE PROCEDURE insert_super_admin(
 BEGIN
     DECLARE userID CHAR(255);
     DECLARE uni_id INT;
-
+    DECLARE emailDomain VARCHAR(255);
+    
     -- Grabbing domain 
     SET emailDomain = SUBSTRING_INDEX(admin_email, '@', -1);
     -- Search for domain in university table
     SELECT UNIVERSITY_ID INTO uni_id FROM UNIVERSITY WHERE UNIVERSITY_EMAIL = emailDomain;
     -- if found, return error
-    IF uni_id IS NOT NULL THEN
-        SELECT 'Error: University already exists with this email domain';
-        LEAVE;
-    END IF;
+    -- IF uni_id IS NOT NULL THEN
+    --     SELECT 'Error: University already exists with this email domain';
+    --     RETURN;
+    -- END IF;
 
     START TRANSACTION;
 
@@ -280,7 +268,7 @@ BEGIN
     -- Get the last inserted university ID
     SET uni_id = LAST_INSERT_ID();
 
-    INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES (userID, , SHA2(admin_pass, 256));
+    INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES (userID, admin_email, SHA2(admin_pass, 256));
     INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID) VALUES (userID, admin_name, uni_id);
     INSERT INTO SUPER_ADMIN (USER_ID, UNIVERSITY_ID) VALUES (userID, uni_id);
 
@@ -288,11 +276,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Call the procedure
-CALL insert_super_admin('admin@ucf.edu', 'Admin Name', 'University Name');
-
-SELECT * FROM SUPER_ADMIN;
-SELECT * FROM UNIVERSITY;
 
 
 -- PROCEDURE TO UPDATE UNIVERSITY INFO
@@ -361,8 +344,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Call the procedure
-CALL testUpdateUniversity();
 
 
 -- PROCEDURE TO FIND USER TYPE
@@ -497,7 +478,26 @@ DELIMITER ;
 -- call procedure to test the rso creation
 CALL testRSO();
 
+-- Insert test super admin (admin@ucf.edu 'James D. Taiclet' 'Password1!' University of Central Florida)
+CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'University of Central Florida');
 
+-- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
+
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL insert_user_login('rso@ucf.edu', 'Password1!');
+-- CALL insert_user_login('admin@ucf.edu', 'Password1!');
+CALL insert_user_login('guy3@ucf.edu', 'Password1!');
+-- CALL validate_user('admin@ucf.edu', 'Password1!');
+
+CALL insert_user_login('test@ucf.edu', 'Password1!');
+CALL validate_user('test@ucf.edu', 'Password1!');
+
+
+SELECT * FROM SUPER_ADMIN;
+SELECT * FROM UNIVERSITY;
+
+-- Call the procedure
+CALL testUpdateUniversity();
 
 -- TO DO:
 -- X 1. Update procedure for sign up to include user info and set as student 
