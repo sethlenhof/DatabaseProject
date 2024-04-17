@@ -52,8 +52,8 @@ TO DO UPDATED:
   -[ ] c. validate that there are 4 emails and the users exist
 
 - [ ] 2. Join RSOs
-  -[ ] a. GET RSO endpoint
-  -[ ] b. populate onto the join rso modal
+  -[X] a. GET RSO endpoint
+  -[X] b. populate onto the join rso modal
   -[ ] c. Join buttons next to each RSO
   -[ ] d. POST to join the RSO
   -[ ] e. Wire to front end, show toast

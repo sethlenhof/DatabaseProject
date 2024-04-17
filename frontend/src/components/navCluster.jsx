@@ -3,7 +3,7 @@ import Modal from './modal';
 import EventForm from './eventForm.jsx';
 import RsoForm from './createRsoForm.jsx';
 import UniversityProfileForm from './universityForm.jsx';
-import { computeFallbackHeaderFormat } from '@fullcalendar/core/internal';
+import JoinRSO from './joinRSO.jsx';
 
 const NavCluster = ({ user }) => {
     const [modalContent, setModalContent] = useState('');
@@ -54,7 +54,7 @@ const NavCluster = ({ user }) => {
             case 'approveEvents':
                 return <h1>Approve Events Form</h1>;
             case 'join-rso':
-                return <h1>RSO Join Form</h1>;
+                return <h1><JoinRSO /></h1>;
             default:
                 return null;
         }
@@ -74,7 +74,8 @@ const NavCluster = ({ user }) => {
                     <button onClick={() => handleOpenModal('approveEvents')} style={buttonStyle}>Approve Events</button>
                 </>
             )}
-            {['student', 'rsoAdmin'].includes(user.role) && (
+            {/* make sure to remove super admin later */}
+            {['student', 'rsoAdmin', 'superAdmin'].includes(user.role) && (
             <>
                 <button onClick={() => handleOpenModal('create-rso')} style={createButtonStyle}>Create RSO</button>
                 <button onClick={() => handleOpenModal('join-rso')} style={buttonStyle}>Join RSO</button>
