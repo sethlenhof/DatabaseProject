@@ -70,10 +70,9 @@ const JoinRSO = () => {
                 }}>
                     <h4>{rso.RSO_NAME}</h4>
                     <p>{rso.RSO_DESCRIPTION}</p>
-                    <Button onClick={() => joinRSO(rso.RSO_ID)} style={buttonStyle}>
+                    <Button onClick={() => joinRSO(rso.RSO_ID)}>
                         Join
                     </Button>
-                    <Button type="submit">Join</Button>
                 </div>
             ))}
         </div>
