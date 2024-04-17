@@ -470,7 +470,7 @@ DELIMITER //
     DECLARE userID CHAR(255);
     -- to test different user, update this email
     SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
-    CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
+    CALL create_rso_and_admin(userID, 'UCF CLUB', 'red', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
 
     SELECT * FROM RSO;
     SELECT * FROM RSO_ADMIN;
