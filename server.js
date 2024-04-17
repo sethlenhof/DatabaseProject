@@ -258,6 +258,37 @@ app.post("/api/updateUniversityInfo", (req, res) => {
 	});
 });
 
+
+// *===========================================================*
+// |               		CREATE RSO API		       			   |
+// *===========================================================*
+// Incoming: { userId, name, type, color, description }
+// Outgoing: { status }
+app.post("/api/rsos/create", (req, res) => {
+	const { userId, name, type, color, description } = req.body;
+	if (!userId || !name || !type || !color || !description) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId, name, type, color, description });
+
+	const sql = "CALL create_rso_and_admin(?, ?, ?, ?, ?)";
+	db.query(sql, [data.userId, data.name, data.type, data.color, data.description], function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({});
+	});
+});
+
 // *===========================================================*
 // |               		GET RSOs API       			           |
 // *===========================================================*

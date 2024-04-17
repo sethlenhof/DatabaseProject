@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from './modal';
 import EventForm from './eventForm.jsx';
-import RsoForm from './createRsoForm.jsx';
+import CreateRso from './createRsoForm.jsx';
 import UniversityProfileForm from './universityForm.jsx';
 import JoinRSO from './joinRSO.jsx';
 
@@ -48,7 +48,7 @@ const NavCluster = ({ user }) => {
             case 'createEvent':
                 return <EventForm />
             case 'create-rso':
-                return <RsoForm />;
+                return <CreateRso />;
             case 'university':
                 return <UniversityProfileForm />;
             case 'approveEvents':
