@@ -259,7 +259,7 @@ BEGIN
     --     SELECT 'Error: University already exists with this email domain';
     --     RETURN;
     -- END IF;
-
+    set userID = UUID();
     START TRANSACTION;
 
     -- Create University with same email domain as admin email
