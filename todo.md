@@ -51,10 +51,12 @@ university_login
 
 
 TO DO UPDATED:
-- [ ] 1. Create RSO endpoint wired up to the component
-  -[ ] a. update the form if needed
-  -[ ] b. create the endpoint to create an RSO
-  -[ ] c. validate that there are 4 emails and the users exist
+- [X] 1. Create RSO endpoint wired up to the component
+  -[X] a. update the form if needed
+  -[x] b. update the procedure
+  -[X] c. create the endpoint to create an RSO
+  -[ ] d. validate that there are 4 emails and the users exist
+  -[X] e. wire together with api
 
 - [X] 2. Join RSOs
   -[X] a. GET RSO endpoint
