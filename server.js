@@ -113,21 +113,39 @@ app.post("/api/users/signup", (req, res) => {
 // *===========================================================*
 // |                	CREATE EVENT API           			   |
 // *===========================================================*
-// Incoming: {username, rsoId, name, category, description, startTime, endTime, date, location, contactPhone, contactEmail}
+// Incoming: { rsoId, universityId, name, category, description, startTime, endTime, location, contactPhone, contactEmail }
 // Outgoing: { status }
+// example api call: http://localhost:2363/api/events/create with body: (1, 1, 'UCF Event', 'Education', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+/* Body:
+{
+	"rsoId": 1,
+	"universityId": 1,
+	"name": "UCF Event",
+	"category": "Education",
+	"description": "This is a test event",
+	"startTime": "2021-10-01 12:00:00",
+	"endTime": "2021-10-01 14:00:00",
+	"location": "UCF Student Union",
+	"contactPhone": "407-123-4567",
+	"contactEmail": "test@email.com"
+}
+*/
 app.post("/api/events/create", (req, res) => {
-	const { username, rsoId, name, category, description, time, date, location, contactPhone, contactEmail } = req.body;
-	if (!username || !rsoId || !name || !category || !description || !startTime || !endTime || !date || !location || !contactPhone || !contactEmail) {
+	// create const based on incoming
+	const { rsoId, universityId, name, category, description, startTime, endTime, location, contactPhone, contactEmail } = req.body;
+	if (!rsoId || !universityId || !name || !category || !description || !startTime || !endTime || !location || !contactPhone || !contactEmail) {
 		return res.status(400).json({ error: "missingFields" });
 	}
 
+
 	// Assuming 'sanitizeData' function is defined elsewhere to sanitize inputs
-	var data = sanitizeData({ username, rsoId, name, category, description, startTime, endTIme, date, location, contactPhone, contactEmail });
+	var data = sanitizeData({ rsoId, universityId, name, category, description, startTime, endTime, location, contactPhone, contactEmail });
 	
-	//startTime and Date need to be formatted YYYY-MM-DDT12:00:00 -> 2024-04-10T12:00:00
-	startTime = date + "T" + startTime;
-	const sql = "CALL insert_event(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	const params = [data.username, data.rsoId, data.name, data.category, data.description, data.startTime, data.endTIme, data.date, data.location, data.contactPhone, data.contactEmail];
+	//startTime and endTime need to be formatted YYYY-MM-DDT12:00:00 -> 2024-04-10T12:00:00
+
+
+	const sql = "CALL insert_event(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	const params = [data.rsoId, data.universityId, data.name, data.category, data.description, data.startTime, data.endTime, data.location, data.contactPhone, data.contactEmail];
 	db.query(sql, params, function (err, result) {
 		// Handle SQL error
 		if (err) {
@@ -140,7 +158,7 @@ app.post("/api/events/create", (req, res) => {
 		if (response.RESPONSE_STATUS === "Error") {
 			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
 		}
-		return res.status(200).json({});
+		return res.status(200).json({Success: "Successfully created event"});
 	});
 });
 
