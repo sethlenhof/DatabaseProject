@@ -236,8 +236,10 @@ END //
 DELIMITER ;
 
 
--- Insert test University
-INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
+-- Insert test super admin (admin@ucf.edu 'James D. Taiclet' 'Password1!' University of Central Florida)
+CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'University of Central Florida');
+
+-- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
 
 CALL insert_user_login('test@ucf.edu', 'Password1!');
 CALL insert_user_login('rso@ucf.edu', 'Password1!');
@@ -351,7 +353,7 @@ CREATE PROCEDURE testUpdateUniversity()
 BEGIN
     DECLARE userID CHAR(255);
     -- to test different user, update this email
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
     CALL update_university_info(userID, 'New University Name', 'New Location', 'New Description', 1000, 'blue');
     SELECT * FROM UNIVERSITY;
     CALL update_university_info(userID, 'New Name', 'IDK Location', 'New Description', 1000, 'blue');
