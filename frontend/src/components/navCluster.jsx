@@ -3,6 +3,7 @@ import Modal from './modal';
 import EventForm from './eventForm.jsx';
 import RsoForm from './createRsoForm.jsx';
 import UniversityProfileForm from './universityForm.jsx';
+import { computeFallbackHeaderFormat } from '@fullcalendar/core/internal';
 
 const NavCluster = ({ user }) => {
     const [modalContent, setModalContent] = useState('');
@@ -62,21 +63,26 @@ const NavCluster = ({ user }) => {
     return (
         <div style={buttonClusterStyle}>
             {['rsoAdmin', 'superAdmin'].includes(user.role) && (
-                <button onClick={() => handleOpenModal('createEvent')} style={createButtonStyle}>Create Event</button>
+                <button onClick={() => handleOpenModal('createEvent')} style={createButtonStyle}>Create University Event</button>
             )}
             <Modal show={showModal} onClose={handleCloseModal}>
                 {renderModalContent()}
             </Modal>
             {user.role === 'superAdmin' && (
                 <>
-                    <button onClick={() => handleOpenModal('university')} style={buttonStyle}>University Page</button>
+                    <button onClick={() => handleOpenModal('university')} style={buttonStyle}>Update University Page</button>
                     <button onClick={() => handleOpenModal('approveEvents')} style={buttonStyle}>Approve Events</button>
                 </>
             )}
-            <button onClick={() => handleOpenModal('create-rso')} style={buttonStyle}>Create RSO</button>
-            <button onClick={() => handleOpenModal('join-rso')} style={buttonStyle}>Join RSO</button>
-
-
+            {['student', 'rsoAdmin'].includes(user.role) && (
+            <>
+                <button onClick={() => handleOpenModal('create-rso')} style={createButtonStyle}>Create RSO</button>
+                <button onClick={() => handleOpenModal('join-rso')} style={buttonStyle}>Join RSO</button>
+            </>
+            )}
+            {user.role === 'unknown' && (
+                <button onClick={() => window.location.href="/"} style={buttonStyle}>Login</button>
+            )}
         </div>
     );
 };
