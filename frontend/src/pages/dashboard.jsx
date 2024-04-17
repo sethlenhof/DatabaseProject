@@ -21,22 +21,7 @@ export default class Dashboard extends React.Component {
             ]
         };
     }
-    
-
-    componentDidMount() {
-        console.log("component did mount")
-        this.fetchUserType();
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        console.log('Parent component did update');
-    }
-    
-    componentWillUnmount() {
-        console.log('Parent component will unmount');
-    }
-    
-
+  
     //fetch userType
     fetchUserType = () => {
         const url = `/api/users/type?userId=${this.state.userId}`;
