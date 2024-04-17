@@ -51,12 +51,12 @@ TO DO UPDATED:
   -[ ] b. create the endpoint to create an RSO
   -[ ] c. validate that there are 4 emails and the users exist
 
-- [ ] 2. Join RSOs
+- [X] 2. Join RSOs
   -[X] a. GET RSO endpoint
   -[X] b. populate onto the join rso modal
-  -[ ] c. Join buttons next to each RSO
-  -[ ] d. POST to join the RSO
-  -[ ] e. Wire to front end, show toast
+  -[X] c. Join buttons next to each RSO
+  -[X] d. POST to join the RSO
+  -[X] e. Wire to front end, show toast
 
 - [ ] 3. Create Events
   -[ ] a. GET to determine RSO(S)
