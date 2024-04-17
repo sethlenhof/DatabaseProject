@@ -45,6 +45,6 @@ Queries needed:
 
 university_login
 - [x] 1. Add university email to UNI table [SQL]
-- [x] 2. On signup check for uni email (after the @) [database.js]
+- [x] 2. On signup check for uni email (after the @) [SQL]
 -   [x] a. Add uni to user_info on signup [SQL]
-- [x] 3. Add user_info creation to signup
+- [x] 3. Add user_info creation to signup [SQL]
