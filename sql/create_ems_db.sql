@@ -45,6 +45,7 @@ CREATE TABLE UNIVERSITY (
 CREATE TABLE RSO (
     RSO_ID INT AUTO_INCREMENT PRIMARY KEY,
     RSO_NAME VARCHAR(255),
+    RSO_TYPE VARCHAR(255),
     COLOR VARCHAR(255),
     RSO_DESCRIPTION TEXT,
     UNIVERSITY_ID INT,
@@ -396,45 +397,50 @@ DELIMITER ;
 
 -- create a new RSO and assign the creating user as the admin
 DELIMITER //
+
 CREATE PROCEDURE create_rso_and_admin(
     IN input_user_id CHAR(255),
     IN input_rso_name VARCHAR(255),
-    IN rso_color VARCHAR(255),
-    IN rso_description TEXT
+    IN input_rso_type VARCHAR(255),
+    IN input_rso_color VARCHAR(255),
+    IN input_rso_description TEXT
 )
 BEGIN
     DECLARE new_rso_id INT;
     DECLARE existing_admin_count INT;
     DECLARE existing_rso_count INT;
     DECLARE existing_user_count INT;
-    DECLARE user_uni_id INT;
+    DECLARE user_university_id INT;
 
-        CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
         RESPONSE_STATUS VARCHAR(20),
         RESPONSE_MESSAGE VARCHAR(255)
     );
-    
-    -- Check if an RSO with the same name already exists
-    SELECT COUNT(*) INTO existing_rso_count FROM RSO WHERE RSO_NAME = input_rso_name;
 
-    -- get user university id
-    SELECT UNIVERSITY_ID INTO user_uni_id FROM USER_INFO WHERE USER_ID = input_user_id;
+    -- Check if the user exists and get the university ID
+    SELECT COUNT(*) INTO existing_user_count FROM USER_INFO WHERE USER_ID = input_user_id;
+    SELECT UNIVERSITY_ID INTO user_university_id FROM USER_INFO WHERE USER_ID = input_user_id;
+
+    -- Check if an RSO with the same name exists at the same university
+    SELECT COUNT(*) INTO existing_rso_count
+    FROM RSO
+    WHERE RSO_NAME = input_rso_name AND UNIVERSITY_ID = user_university_id;
 
     -- Start the transaction here to ensure all following operations are atomic
     START TRANSACTION;
 
     IF existing_rso_count > 0 THEN
-        -- If an RSO with this name exists, rollback and signal an error
+        -- If an RSO with this name exists at the same university, rollback and signal an error
         ROLLBACK;
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'An RSO with this name already exists.');
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'An RSO with this name already exists at your university.');
     ELSEIF existing_user_count = 0 THEN
         -- If user does not exist, rollback and signal an error
         ROLLBACK;
         INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'User does not exist.');
     ELSE
         -- Insert new RSO
-        INSERT INTO RSO (RSO_NAME, COLOR, RSO_DESCRIPTION, UNIVERSITY_ID)
-        VALUES (input_rso_name, rso_color, rso_description, user_uni_id);
+        INSERT INTO RSO (RSO_NAME, RSO_TYPE, COLOR, RSO_DESCRIPTION, UNIVERSITY_ID)
+        VALUES (input_rso_name, input_rso_type, input_rso_color, input_rso_description, user_university_id);
 
         -- Capture the RSO_ID of the newly created RSO
         SET new_rso_id = LAST_INSERT_ID();
@@ -460,6 +466,7 @@ BEGIN
     SELECT * FROM RESPONSE;
     DROP TEMPORARY TABLE IF EXISTS RESPONSE;
 END //
+
 DELIMITER ;
 
 -- Call the procedure using a admin user
@@ -469,21 +476,19 @@ DELIMITER //
 
     DECLARE userID CHAR(255);
     SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
-    -- to test different user, update this email
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
-    CALL create_rso_and_admin(userID, 'UCF CLUB1', 'red', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
-    CALL create_rso_and_admin(userID, 'UCF CLUB2', 'pink', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
-    CALL create_rso_and_admin(userID, 'UCF CLUB3', 'orange', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
-    CALL create_rso_and_admin(userID, 'UCF CLUB4', 'green', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
-    CALL create_rso_and_admin(userID, 'UCF CLUB5', 'black', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
-    CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
+    CALL create_rso_and_admin(userID, 'Sample RSO', 'frat', 'red', 'RSO Description');
+    CALL create_rso_and_admin(userID, 'UCF CLUB1', 'club', 'red', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB2', 'club','pink', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB3', 'club','orange', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB4', 'honors','green', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB5', 'honors','black', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
 
     SELECT * FROM RSO;
     SELECT * FROM RSO_ADMIN;
     SELECT * FROM STUDENT;
 
     -- Call the procedure again to see the error message
-    CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
+    CALL create_rso_and_admin(userID, 'Sample RSO', 'club', 'red', 'RSO Description');
     END //
 DELIMITER ;
 
