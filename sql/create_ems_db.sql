@@ -46,15 +46,17 @@ CREATE TABLE RSO (
     RSO_ID INT AUTO_INCREMENT PRIMARY KEY,
     RSO_NAME VARCHAR(255),
     COLOR VARCHAR(255),
-    RSO_DESCRIPTION TEXT
+    RSO_DESCRIPTION TEXT,
+    UNIVERSITY_ID INT,
+    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
 );
 
 CREATE TABLE USER_INFO (
     USER_ID CHAR(255) PRIMARY KEY,
     USERS_NAME VARCHAR(255),
     UNIVERSITY_ID INT,
-    FOREIGN KEY (USER_ID) REFERENCES USER_LOGIN(USER_ID),
-    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID)
+    FOREIGN KEY (UNIVERSITY_ID) REFERENCES UNIVERSITY(UNIVERSITY_ID),
+    FOREIGN KEY (USER_ID) REFERENCES USER_LOGIN(USER_ID)
 );
 
 CREATE TABLE STUDENT (
@@ -396,7 +398,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE create_rso_and_admin(
     IN input_user_id CHAR(255),
-    IN rso_name VARCHAR(255),
+    IN input_rso_name VARCHAR(255),
     IN rso_color VARCHAR(255),
     IN rso_description TEXT
 )
@@ -405,6 +407,7 @@ BEGIN
     DECLARE existing_admin_count INT;
     DECLARE existing_rso_count INT;
     DECLARE existing_user_count INT;
+    DECLARE user_uni_id INT;
 
         CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
         RESPONSE_STATUS VARCHAR(20),
@@ -412,7 +415,10 @@ BEGIN
     );
     
     -- Check if an RSO with the same name already exists
-    SELECT COUNT(*) INTO existing_rso_count FROM RSO WHERE RSO_NAME = rso_name;
+    SELECT COUNT(*) INTO existing_rso_count FROM RSO WHERE RSO_NAME = input_rso_name;
+
+    -- get user university id
+    SELECT UNIVERSITY_ID INTO user_uni_id FROM USER_INFO WHERE USER_ID = input_user_id;
 
     -- Start the transaction here to ensure all following operations are atomic
     START TRANSACTION;
@@ -427,8 +433,8 @@ BEGIN
         INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('ERROR', 'User does not exist.');
     ELSE
         -- Insert new RSO
-        INSERT INTO RSO (RSO_NAME, COLOR, RSO_DESCRIPTION)
-        VALUES (rso_name, rso_color, rso_description);
+        INSERT INTO RSO (RSO_NAME, COLOR, RSO_DESCRIPTION, UNIVERSITY_ID)
+        VALUES (input_rso_name, rso_color, rso_description, user_uni_id);
 
         -- Capture the RSO_ID of the newly created RSO
         SET new_rso_id = LAST_INSERT_ID();
@@ -464,6 +470,12 @@ DELIMITER //
     DECLARE userID CHAR(255);
     SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
     -- to test different user, update this email
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
+    CALL create_rso_and_admin(userID, 'UCF CLUB1', 'red', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB2', 'pink', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB3', 'orange', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB4', 'green', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
+    CALL create_rso_and_admin(userID, 'UCF CLUB5', 'black', 'RSO Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam commodo, turpis at venenatis facilisis, ex dolor dictum nunc, eu varius arcu orci non massa. Donec tincidunt suscipit finibus. Vestibulum sed nisl cursus, pellentesque lorem in, maximus turpis. Morbi fringilla mauris tempor, sodales turpis non, auctor mauris. Quisque sed vulputate dui. Sed non dapibus sapien, sit amet viverra velit. Sed ultrices sem vel lectus pretium, et porta eros tincidunt. Suspendisse facilisis nibh urna, id aliquet sem interdum eu. Suspendisse pulvinar ex eget lacinia aliquam. Sed ultricies suscipit consequat. Etiam scelerisque vehicula vehicula. Praesent ut dolor ex. Cras dictum vel nunc quis accumsan. Sed sed volutpat urna');
     CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
 
     SELECT * FROM RSO;
@@ -501,6 +513,91 @@ CALL testUpdateUniversity();
 -- call procedure to test the rso creation
 -- call procedure to test the rso creation
 CALL testRSO();
+
+-- procedure to get RSOs available from user university
+DELIMITER //
+CREATE PROCEDURE get_rsos(IN input_user_id CHAR(255))
+BEGIN
+    DECLARE uni_id INT;
+
+    SELECT UNIVERSITY_ID INTO uni_id FROM USER_INFO WHERE USER_ID = input_user_id;
+
+    SELECT * FROM RSO WHERE UNIVERSITY_ID = uni_id;
+END //
+DELIMITER ;
+
+-- test procedure to get RSOs
+DELIMITER //
+CREATE PROCEDURE testGetRSO()
+BEGIN
+    DECLARE userID CHAR(255);
+    -- to test different user, update this email
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
+    CALL get_rsos(userID);
+END //
+DELIMITER ;
+
+-- call procedure to test the rso creation
+CALL testGetRSO();
+
+-- procedure to join RSO
+DELIMITER //
+
+CREATE PROCEDURE join_rso(
+    IN input_user_id CHAR(255),
+    IN input_rso_id INT
+)
+BEGIN
+    DECLARE is_member INT DEFAULT 0;
+    DECLARE user_exists INT DEFAULT 0;
+    DECLARE rso_exists INT DEFAULT 0;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
+    -- Check if the user and RSO exist
+    SELECT COUNT(*) INTO user_exists FROM USER_INFO WHERE USER_ID = input_user_id;
+    SELECT COUNT(*) INTO rso_exists FROM RSO WHERE RSO_ID = input_rso_id;
+
+    IF user_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'User does not exist.');
+    ELSEIF rso_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'RSO does not exist.');
+    ELSE
+        -- Check if the user is already a member of this RSO
+        SELECT COUNT(*) INTO is_member FROM STUDENT WHERE USER_ID = input_user_id AND RSO_ID = input_rso_id;
+
+        -- If the user is not already a member, insert the new record
+        IF is_member = 0 THEN
+            INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES (input_rso_id, input_user_id);
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'You have successfully joined the RSO.');
+        ELSE
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'You are already a member of this RSO.');
+        END IF;
+    END IF;
+
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
+END //
+
+DELIMITER ;
+
+-- test procedure to join RSO
+DELIMITER //
+CREATE PROCEDURE testJoinRSO()
+BEGIN
+    DECLARE userID CHAR(255);
+    -- to test different user, update this email
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
+    CALL join_rso(userID, 1);
+    SELECT * FROM STUDENT;
+END //
+DELIMITER ;
+
+-- call procedure to test the rso creation
+CALL testJoinRSO();
 
 -- TO DO:
 -- X 1. Update procedure for sign up to include user info and set as student 
