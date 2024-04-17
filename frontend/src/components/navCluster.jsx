@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import Modal from './modal';
 import EventForm from './eventForm.jsx';
+import RsoForm from './createRsoForm.jsx';
+import UniversityProfileForm from './universityForm.jsx';
+import JoinRSO from './joinRSO.jsx';
 
 const NavCluster = ({ user }) => {
     const [modalContent, setModalContent] = useState('');
@@ -44,12 +47,14 @@ const NavCluster = ({ user }) => {
         switch (modalContent) {
             case 'createEvent':
                 return <EventForm />
-            case 'rso':
-                return <h1>RSO Management Form</h1>;
+            case 'create-rso':
+                return <RsoForm />;
             case 'university':
-                return <h1>University Management Form</h1>;
+                return <UniversityProfileForm />;
             case 'approveEvents':
                 return <h1>Approve Events Form</h1>;
+            case 'join-rso':
+                return <h1><JoinRSO /></h1>;
             default:
                 return null;
         }
@@ -57,22 +62,27 @@ const NavCluster = ({ user }) => {
 
     return (
         <div style={buttonClusterStyle}>
-            {['admin', 'superAdmin'].includes(user.role) && (
-                <button onClick={() => handleOpenModal('createEvent')} style={createButtonStyle}>Create Event</button>
+            {['rsoAdmin', 'superAdmin'].includes(user.role) && (
+                <button onClick={() => handleOpenModal('createEvent')} style={createButtonStyle}>Create University Event</button>
             )}
             <Modal show={showModal} onClose={handleCloseModal}>
                 {renderModalContent()}
             </Modal>
-
-            {user.role === 'admin' && (
-                <button onClick={() => handleOpenModal('rso')} style={buttonStyle}>RSO</button>
-            )}
-            
             {user.role === 'superAdmin' && (
                 <>
-                    <button onClick={() => handleOpenModal('university')} style={buttonStyle}>University Page</button>
+                    <button onClick={() => handleOpenModal('university')} style={buttonStyle}>Update University Page</button>
                     <button onClick={() => handleOpenModal('approveEvents')} style={buttonStyle}>Approve Events</button>
                 </>
+            )}
+            {/* make sure to remove super admin later */}
+            {['student', 'rsoAdmin', 'superAdmin'].includes(user.role) && (
+            <>
+                <button onClick={() => handleOpenModal('create-rso')} style={createButtonStyle}>Create RSO</button>
+                <button onClick={() => handleOpenModal('join-rso')} style={buttonStyle}>Join RSO</button>
+            </>
+            )}
+            {user.role === 'unknown' && (
+                <button onClick={() => window.location.href="/"} style={buttonStyle}>Login</button>
             )}
         </div>
     );

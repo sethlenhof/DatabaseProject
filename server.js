@@ -178,6 +178,128 @@ app.post("/api/rso/admin", (req, res) => {
 });
 
 
+// *===========================================================*
+// |                 USER TYPE API                             |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status, userType }
+app.get("/api/users/type", (req, res) => {
+    const { userId } = req.query; // Assuming the userId is passed as a query parameter
+
+    if (!userId) {
+        return res.status(400).json({ error: "Missing Fields" });
+    }
+	var data = sanitizeData({ userId });
+    const sql = "CALL get_user_type(?)";
+    const params = [data.userId];
+    db.query(sql, params, function (err, results) {
+        if (err) {
+            return res.status(400).json({ error: "SQL error", details: err.message });
+        }
+        
+        const response = results[0][0]; // Assuming that the stored procedure returns the result in the first index
+        if (response) {
+			console.log(response);
+            return res.status(200).json({
+                userType: response.RESPONSE_MESSAGE
+            });
+        } else {
+            return res.status(404).json({ error: "User not found" });
+        }
+    });
+});
+
+// *===========================================================*
+// |               UPDATE UNIVERSIY INFO API       			   |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status }
+app.post("/api/updateUniversityInfo", (req, res) => {
+	const { userId, name, location, description, numStudents, color } = req.body;
+	if (!userId || !name || !location || !description || !numStudents || !color) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId, name, location, description, numStudents, color });
+
+	const sql = "CALL update_university_info(?, ?, ?, ?, ?, ?)";
+	const params = [data.userId, data.name, data.location, data.description, data.numStudents, data.color];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({response: response.RESPONSE_MESSAGE});
+	});
+});
+
+// *===========================================================*
+// |               		GET RSOs API       			           |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status, rsos }
+app.get("/api/rsos", (req, res) => {
+	const { userId } = req.query;
+	if (!userId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId });
+
+	const sql = "CALL get_rsos(?)";
+	const params = [data.userId];
+	db.query(sql, params, function (err, results) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({ rsos: response });
+	});
+});
+
+// *===========================================================*
+// |               		JOIN RSO API       			           |
+// *===========================================================*
+// Incoming: { userId, rsoId }
+// Outgoing: { status }
+app.post("/api/rso/join", (req, res) => {
+	const { userId, rsoId } = req.body;
+	if (!userId || !rsoId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId, rsoId });
+
+	const sql = "CALL join_rso(?, ?)";
+	const params = [data.userId, data.rsoId];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({});
+	});
+});
 
 // sanitizeData function to sanitize input data
 // prevent SQL injection
