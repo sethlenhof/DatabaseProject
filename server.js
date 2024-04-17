@@ -202,6 +202,36 @@ app.get("/api/rsos", (req, res) => {
 	});
 });
 
+// *===========================================================*
+// |               		JOIN RSO API       			           |
+// *===========================================================*
+// Incoming: { userId, rsoId }
+// Outgoing: { status }
+app.post("/api/rso/join", (req, res) => {
+	const { userId, rsoId } = req.body;
+	if (!userId || !rsoId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId, rsoId });
+
+	const sql = "CALL join_rso(?, ?)";
+	const params = [data.userId, data.rsoId];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({});
+	});
+});
 
 // sanitizeData function to sanitize input data
 // prevent SQL injection
