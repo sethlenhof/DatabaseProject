@@ -21,6 +21,11 @@ export default class Dashboard extends React.Component {
             ]
         };
     }
+
+    componentDidMount() {
+        console.log("component did mount")
+        this.fetchUserType();
+    }
   
     //fetch userType
     fetchUserType = () => {
