@@ -110,14 +110,19 @@ CREATE TABLE COMMENT (
 );
 
 
+
+-- ||===================================================================================================||
+-- ||                                     INSERT USER_LOGIN                                             ||              
+-- ||===================================================================================================||
 DELIMITER //
--- INSERT USER_LOGIN
 CREATE PROCEDURE insert_user_login(IN input_email VARCHAR(255), IN input_pass VARCHAR(255))
 BEGIN
     -- Check if the email already exists
     DECLARE emailExists INT;
     DECLARE passLength INT;
     DECLARE userGUID CHAR(255);
+    DECLARE UNI_ID INT;
+    DECLARE UNI_EXISTS INT;
 
     SET userGUID = UUID();
     
@@ -130,15 +135,27 @@ BEGIN
     SELECT COUNT(*) INTO emailExists FROM USER_LOGIN WHERE EMAIL = input_email;
     SELECT LENGTH(input_pass) INTO passLength;
 
+    -- Get the email domain from the email (e.g. gmail.com, yahoo.com)
+    SET emailDomain = SUBSTRING_INDEX(input_email, '@', -1);
+    -- Check if the email domain is a university
+    SELECT COUNT(*) INTO UNI_EXISTS FROM UNIVERSITY WHERE UNIVERSITY_EMAIL = emailDomain;
+
+
+
     -- Insert the new user only if the email does not exist
     IF emailExists > 0 THEN
         INSERT INTO RESPONSE VALUES ('Error', 'duplicateEmail');
     ELSEIF passLength < 8 THEN
         INSERT INTO RESPONSE VALUES ('Error', 'invalidPass');
+    ELSEIF UNI_EXISTS = 0 THEN
+        INSERT INTO RESPONSE VALUES ('Error', 'invalidUniversityEmail');
     ELSE
         -- Insert the new user if the email does not exist
         INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES (userGUID, input_email, SHA2(input_pass, 256));
         INSERT INTO RESPONSE VALUES ('Success', CONCAT('User added ', userGUID));
+        
+        -- Get the university ID
+        SELECT UNIVERSITY_ID INTO UNI_ID FROM UNIVERSITY WHERE UNIVERSITY_EMAIL = emailDomain;
 
         -- Insert the user into the USER_INFO table
         INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID) VALUES (userGUID, 'New User', UNI_ID);
@@ -148,6 +165,10 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- ||===================================================================================================||
+-- ||                                       VALIDATE_USER                                               ||              
+-- ||===================================================================================================||
 
 DELIMITER //
 CREATE PROCEDURE validate_user(IN input_email VARCHAR(255), IN input_pass VARCHAR(255))
