@@ -1,4 +1,4 @@
-
+USE event_management_system;
 
 DROP PROCEDURE IF EXISTS get_unapproved_events;
 
