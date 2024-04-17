@@ -97,8 +97,10 @@ DELIMITER //
     END //
 DELIMITER ;
 
---call procedure to test the rso creation
+-- call procedure to test the rso creation
 CALL testRSO();
+
+DROP PROCEDURE IF EXISTS get_rsos;
 
 -- procedure to get RSOs available from user university
 DELIMITER //
@@ -111,6 +113,8 @@ BEGIN
     SELECT * FROM RSO WHERE UNIVERSITY_ID = uni_id;
 END //
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS testGetRSO;
 
 -- test procedure to get RSOs
 DELIMITER //
@@ -125,3 +129,69 @@ DELIMITER ;
 
 -- call procedure to test the rso creation
 CALL testGetRSO();
+
+DROP PROCEDURE IF EXISTS join_rso;
+
+-- procedure to join RSO
+DELIMITER //
+
+CREATE PROCEDURE join_rso(
+    IN input_user_id CHAR(255),
+    IN input_rso_id INT
+)
+BEGIN
+    DECLARE is_member INT DEFAULT 0;
+    DECLARE user_exists INT DEFAULT 0;
+    DECLARE rso_exists INT DEFAULT 0;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
+    -- Check if the user and RSO exist
+    SELECT COUNT(*) INTO user_exists FROM USER_INFO WHERE USER_ID = input_user_id;
+    SELECT COUNT(*) INTO rso_exists FROM RSO WHERE RSO_ID = input_rso_id;
+
+    IF user_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'User does not exist.');
+    ELSEIF rso_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'RSO does not exist.');
+    ELSE
+        -- Check if the user is already a member of this RSO
+        SELECT COUNT(*) INTO is_member FROM STUDENT WHERE USER_ID = input_user_id AND RSO_ID = input_rso_id;
+
+        -- If the user is not already a member, insert the new record
+        IF is_member = 0 THEN
+            INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES (input_rso_id, input_user_id);
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'You have successfully joined the RSO.');
+        ELSE
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'You are already a member of this RSO.');
+        END IF;
+    END IF;
+
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
+END //
+
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS testJoinRSO;
+
+-- test procedure to join RSO
+DELIMITER //
+CREATE PROCEDURE testJoinRSO()
+BEGIN
+    DECLARE userID CHAR(255);
+    -- to test different user, update this email
+    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
+    CALL join_rso(userID, 1);
+    CALL join_rso(userID, 2);
+
+    SELECT * FROM STUDENT;
+END //
+DELIMITER ;
+
+-- call procedure to test the rso creation
+CALL testJoinRSO();
