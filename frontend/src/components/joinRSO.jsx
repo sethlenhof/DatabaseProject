@@ -5,6 +5,11 @@ const JoinRSO = () => {
     const [rsos, setRsos] = useState([]);
     const userId = localStorage.getItem('user');
 
+    if(!userId) {
+        //show toast
+        window.showToast({title: "Error", message: "Must sign in to join RSO", type: "error", autoHide: false});
+    }
+
     useEffect(() => {
         if (userId) {
             fetch(`/api/rsos?userId=${userId}`)
@@ -14,19 +19,21 @@ const JoinRSO = () => {
         }
      }, [userId]);
     //this needs to be made lmao
-    const joinRSO = (rsoId) => {
-        // Assuming the API requires a POST request to join an RSO
-        fetch(`/api/join-rso/${rsoId}`, {
+    const joinRSO = (rsoId, rsoName) => {
+        fetch('/api/rso/join', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ userId, rsoId }) // Sending both userId and rsoId
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Joined RSO successfully!');
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                window.showToast({title: "Error", message: data.error, type: "error", autoHide: true});
+
             } else {
-                alert('Failed to join RSO.');
+                window.showToast({title: "Success", message: `Joined RSO ${rsoName}`, type: "success", autoHide: true});
             }
         })
         .catch(error => console.error('Error joining RSO:', error));
@@ -70,7 +77,7 @@ const JoinRSO = () => {
                 }}>
                     <h4>{rso.RSO_NAME}</h4>
                     <p>{rso.RSO_DESCRIPTION}</p>
-                    <Button onClick={() => joinRSO(rso.RSO_ID)}>
+                    <Button onClick={() => joinRSO(rso.RSO_ID, rso.RSO_NAME)}>
                         Join
                     </Button>
                 </div>
