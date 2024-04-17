@@ -465,9 +465,9 @@ CALL testRSO();
 
 
 -- TO DO:
--- 1. Update procedure for sign up to include user info and set as student
--- 2. update sign up endpoint to call the updated procedure
+-- X 1. Update procedure for sign up to include user info and set as student 
+-- X 2. update sign up endpoint to call the updated procedure
 -- 3. Update front end to include user info
--- 4. make logic where if user is super admin, their email prefix is used to identify students
--- 5. use this in endpoint to set student university
--- OR make it so a user registers as a student at a university and then can create an RSO at that school
+-- X (But for all users) 4. make logic where if user is super admin, their email prefix is used to identify students
+-- X 5. use this in endpoint to set student university
+-- X OR make it so a user registers as a student at a university and then can create an RSO at that school
