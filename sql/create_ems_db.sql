@@ -248,9 +248,7 @@ CALL insert_user_login('guy3@ucf.edu', 'Password1!');
 CALL insert_user_login('test@ucf.edu', 'Password1!');
 CALL validate_user('test@ucf.edu', 'Password1!');
 
-use event_management_system;
-DROP PROCEDURE IF EXISTS insert_super_admin;
-
+-- procedure to insert a super admin
 DELIMITER //
 CREATE PROCEDURE insert_super_admin(
     IN admin_email VARCHAR(255),
@@ -482,7 +480,6 @@ DELIMITER //
     DECLARE userID CHAR(255);
     SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@ucf.edu';
     -- to test different user, update this email
-    SELECT USER_ID INTO userID FROM USER_LOGIN WHERE EMAIL = 'admin@admin.com';
     CALL create_rso_and_admin(userID, 'Sample RSO', 'red', 'RSO Description');
 
     SELECT * FROM RSO;
