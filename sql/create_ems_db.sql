@@ -378,7 +378,7 @@ BEGIN
     ELSEIF is_student > 0 THEN
         SET user_type = 'student';
     ELSE
-        SET user_type = 'Unknown';
+        SET user_type = 'unknown';
     END IF;
 
     -- Insert the result into the response table
