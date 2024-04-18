@@ -232,15 +232,31 @@ BEGIN
     SELECT * FROM EVENTS WHERE UNIVERSITY_ID IS NULL AND RSO_ID IS NULL;
 END //
 
+-- find public events for user (where there is no RSO and no University)
+DELIMITER //
+CREATE PROCEDURE find_approved_events()
+BEGIN
+    -- select all events that are public and approved
+    SELECT * FROM APPROVED_EVENTS;
+END //
 
 -- find all events for user
 DELIMITER //
 CREATE PROCEDURE find_all_events(IN input_user_id INT)
 BEGIN
-    -- select all events for the user, calling other procedures
-    CALL find_RSO_events(input_user_id);
-    CALL find_private_events(input_user_id);
-    CALL find_public_events();
+    -- create reponse
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
+    -- Union all calls to get all events
+    SELECT * FROM EVENTS WHERE RSO_ID IN (SELECT RSO_ID FROM STUDENT WHERE USER_ID = input_user_id)
+    UNION
+    SELECT * FROM EVENTS WHERE UNIVERSITY_ID = (SELECT UNIVERSITY_ID FROM USER_INFO WHERE USER_ID = input_user_id) AND RSO_ID IS NULL
+    UNION
+    SELECT * FROM EVENTS WHERE EVENT_ID IN (SELECT EVENT_ID FROM APPROVED_EVENTS);
+    
 END //
 DELIMITER ;
 
@@ -282,8 +298,52 @@ END //
 
 DELIMITER ;
 
+-- //===============================================================================================//
+-- //                                PROCEDURES FOR ADDING ROLES                                    //
+-- //===============================================================================================//
 
+-- procedure to join RSO
+DELIMITER //
 
+CREATE PROCEDURE join_rso(
+    IN input_user_id CHAR(255),
+    IN input_rso_id INT
+)
+BEGIN
+    DECLARE is_member INT DEFAULT 0;
+    DECLARE user_exists INT DEFAULT 0;
+    DECLARE rso_exists INT DEFAULT 0;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
+    -- Check if the user and RSO exist
+    SELECT COUNT(*) INTO user_exists FROM USER_INFO WHERE USER_ID = input_user_id;
+    SELECT COUNT(*) INTO rso_exists FROM RSO WHERE RSO_ID = input_rso_id;
+
+    IF user_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'User does not exist.');
+    ELSEIF rso_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'RSO does not exist.');
+    ELSE
+        -- Check if the user is already a member of this RSO
+        SELECT COUNT(*) INTO is_member FROM STUDENT WHERE USER_ID = input_user_id AND RSO_ID = input_rso_id;
+
+        -- If the user is not already a member, insert the new record
+        IF is_member = 0 THEN
+            INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES (input_rso_id, input_user_id);
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'You have successfully joined the RSO.');
+        ELSE
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'You are already a member of this RSO.');
+        END IF;
+    END IF;
+
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
+END //
+DELIMITER ;
 
 -- procedure to insert a super admin
 DELIMITER //
@@ -561,50 +621,6 @@ END //
 DELIMITER ;
 
 
--- procedure to join RSO
-DELIMITER //
-
-CREATE PROCEDURE join_rso(
-    IN input_user_id CHAR(255),
-    IN input_rso_id INT
-)
-BEGIN
-    DECLARE is_member INT DEFAULT 0;
-    DECLARE user_exists INT DEFAULT 0;
-    DECLARE rso_exists INT DEFAULT 0;
-
-    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
-        RESPONSE_STATUS VARCHAR(20),
-        RESPONSE_MESSAGE VARCHAR(255)
-    );
-
-    -- Check if the user and RSO exist
-    SELECT COUNT(*) INTO user_exists FROM USER_INFO WHERE USER_ID = input_user_id;
-    SELECT COUNT(*) INTO rso_exists FROM RSO WHERE RSO_ID = input_rso_id;
-
-    IF user_exists = 0 THEN
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'User does not exist.');
-    ELSEIF rso_exists = 0 THEN
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'RSO does not exist.');
-    ELSE
-        -- Check if the user is already a member of this RSO
-        SELECT COUNT(*) INTO is_member FROM STUDENT WHERE USER_ID = input_user_id AND RSO_ID = input_rso_id;
-
-        -- If the user is not already a member, insert the new record
-        IF is_member = 0 THEN
-            INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES (input_rso_id, input_user_id);
-            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'You have successfully joined the RSO.');
-        ELSE
-            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'You are already a member of this RSO.');
-        END IF;
-    END IF;
-
-    SELECT * FROM RESPONSE;
-    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
-END //
-
-DELIMITER ;
-
 -- test procedure to join RSO
 DELIMITER //
 CREATE PROCEDURE testJoinRSO()
@@ -719,14 +735,18 @@ CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'Univ
 
 -- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
 
-CALL insert_user_login('test@ucf.edu', 'Password1!');
+-- CALL insert_user_login('test@ucf.edu', 'Password1!');
 CALL insert_user_login('rso@ucf.edu', 'Password1!');
--- CALL insert_user_login('admin@ucf.edu', 'Password1!');
+CALL insert_user_login('admin@ucf.edu', 'Password1!');
 CALL insert_user_login('guy3@ucf.edu', 'Password1!');
--- CALL validate_user('admin@ucf.edu', 'Password1!');
+CALL validate_user('admin@ucf.edu', 'Password1!');
 
-CALL insert_user_login('test@ucf.edu', 'Password1!');
+-- manually insert test user
+INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES ('0', 'test@ucf.edu', SHA2('Password1!', 256));
+INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID) VALUES ('0', 'Test User', 1);
+
 CALL validate_user('test@ucf.edu', 'Password1!');
+
 
 
 SELECT * FROM SUPER_ADMIN;
@@ -745,11 +765,28 @@ CALL testGetRSO();
 -- call procedure to test the rso creation
 CALL testJoinRSO();
 
--- insert event params: (p_rso_id INT, p_university_id INT, p_name VARCHAR(255), p_category VARCHAR(255), p_description TEXT, p_event_start VARCHAR(255), p_event_end VARCHAR(255), p_location VARCHAR(255), p_contact_phone VARCHAR(255), p_contact_email VARCHAR(255))
-CALL insert_event(1, 1, 'UCF Event', 'Education', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 
--- SELECT ALL EVENTS
-SELECT * FROM EVENTS;
+-- RSO events
+-- insert event params: (p_rso_id INT, p_university_id INT, p_name VARCHAR(255), p_category VARCHAR(255), p_description TEXT, p_event_start VARCHAR(255), p_event_end VARCHAR(255), p_location VARCHAR(255), p_contact_phone VARCHAR(255), p_contact_email VARCHAR(255))
+CALL insert_event(1, 1, 'UCF Event', 'Educational', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+-- test RSO event (SHOULD NOT BE ABLE TO SEE FROM STUDENT)
+CALL insert_event(2, 1, 'UCF Event', 'Yippee!', 'This event shouldnt be visible', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+
+-- Private event
+CALL insert_event(NULL, 1, 'UCF Event', 'Educational', 'This is a test event', '2021-11-01 12:00:00', '2021-11-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+-- Public event
+CALL insert_event(NULL, NULL, 'UCF Event', 'Educational', 'This is a test event', '2021-12-01 12:00:00', '2021-12-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+
+-- add test student to RSO
+CALL join_rso('0', 1);
+
+-- test get event
+CALL find_all_events('0');
+
 
 CALL test_get_unapproved_events();
 
