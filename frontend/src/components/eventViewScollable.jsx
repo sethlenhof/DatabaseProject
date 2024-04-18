@@ -25,12 +25,6 @@ const EventViewScrollable = ({events}) => {
         })
     };
 
-    const headerStyle = {
-        marginBottom: '20px',
-        paddingBottom: '10px',
-        borderBottom: '2px solid #ccc'
-    };
-
     return (
         <div style={{
             backgroundColor: "white",
@@ -48,7 +42,6 @@ const EventViewScrollable = ({events}) => {
             padding: "1rem",
             minWidth: "300px",
             width: '45vw', }}>
-            <h1 style={headerStyle}>Upcoming Events</h1>
             {events.map(event => (
                 <div key={event.EVENT_ID} style={{
                     padding: '10px',
