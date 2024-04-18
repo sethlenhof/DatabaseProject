@@ -244,10 +244,19 @@ END //
 DELIMITER //
 CREATE PROCEDURE find_all_events(IN input_user_id INT)
 BEGIN
-    -- select all events for the user, calling other procedures
-    CALL find_RSO_events(input_user_id);
-    CALL find_private_events(input_user_id);
-    CALL find_approved_events();
+    -- create reponse
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
+    -- Union all calls to get all events
+    SELECT * FROM EVENTS WHERE RSO_ID IN (SELECT RSO_ID FROM STUDENT WHERE USER_ID = input_user_id)
+    UNION
+    SELECT * FROM EVENTS WHERE UNIVERSITY_ID = (SELECT UNIVERSITY_ID FROM USER_INFO WHERE USER_ID = input_user_id) AND RSO_ID IS NULL
+    UNION
+    SELECT * FROM APPROVED_EVENTS;
+    
 END //
 DELIMITER ;
 

@@ -168,8 +168,9 @@ app.post("/api/events/create", (req, res) => {
 // Incoming: { userId }
 // Outgoing: { status, events }
 
-app.get("/api/users/events", (req, res) => {
-	const { userId } = req.query;
+app.post("/api/users/events", (req, res) => {
+	const { userId } = req.body;
+
 	if (!userId) {
 		return res.status(400).json({ error: "missingFields" });
 	}
