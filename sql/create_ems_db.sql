@@ -768,17 +768,17 @@ CALL testJoinRSO();
 
 -- RSO events
 -- insert event params: (p_rso_id INT, p_university_id INT, p_name VARCHAR(255), p_category VARCHAR(255), p_description TEXT, p_event_start VARCHAR(255), p_event_end VARCHAR(255), p_location VARCHAR(255), p_contact_phone VARCHAR(255), p_contact_email VARCHAR(255))
-CALL insert_event(1, 1, 'UCF Event', 'Educational', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+CALL insert_event(1, 1, 'UCF Event', 'Educational', 'This is a test event', '2024-04-12 12:00:00', '2024-04-12 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 
 -- test RSO event (SHOULD NOT BE ABLE TO SEE FROM STUDENT)
-CALL insert_event(2, 1, 'UCF Event', 'Yippee!', 'This event shouldnt be visible', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+CALL insert_event(2, 1, 'UCF Event', 'Yippee!', 'This event shouldnt be visible', '2024-04-11 12:00:00', '2024-04-11 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 
 
 -- Private event
-CALL insert_event(NULL, 1, 'UCF Event', 'Educational', 'This is a test event', '2021-11-01 12:00:00', '2021-11-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+CALL insert_event(NULL, 1, 'UCF Event', 'Educational', 'This is a test event', '2024-04-09 12:00:00', '2024-04-09 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 
 -- Public event
-CALL insert_event(NULL, NULL, 'UCF Event', 'Educational', 'This is a test event', '2021-12-01 12:00:00', '2021-12-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+CALL insert_event(NULL, NULL, 'UCF Event', 'Educational', 'This is a test event', '2024-04-10 12:00:00', '2024-04-10 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 
 
 -- add test student to RSO
