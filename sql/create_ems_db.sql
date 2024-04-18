@@ -205,6 +205,18 @@ BEGIN
 END //
 DELIMITER ;
 
+-- ||===================================================================================================||
+-- ||                                       PROCEDURES FOR EVENTS                                       ||
+-- ||===================================================================================================||
+
+-- Find event data by ID
+DELIMITER //
+CREATE PROCEDURE find_event_by_id(IN input_event_id INT)
+BEGIN
+    -- select all events for the RSOs that the user is a part of
+    SELECT * FROM EVENTS WHERE EVENT_ID = input_event_id;
+END //
+
 -- Find RSO events for user
 DELIMITER //
 CREATE PROCEDURE find_RSO_events(IN input_user_id INT)
@@ -297,6 +309,39 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- ||===================================================================================================||
+-- ||                                       PROCEDURES FOR COMMENTS                                     ||
+-- ||===================================================================================================||
+-- create comment
+DELIMITER //
+CREATE PROCEDURE insert_comment(
+    IN p_event_id INT,
+    IN p_user_id CHAR(255),
+    IN p_comment TEXT,
+    IN p_rating INT
+)
+BEGIN
+    INSERT INTO COMMENT (EVENT_ID, USER_ID, COMMENT, RATING)
+    VALUES (p_event_id, p_user_id, p_comment, p_rating);
+
+    -- respond with success
+    SELECT 'Success: Comment created';
+END //
+
+DELIMITER ;
+
+-- get comments for event
+DELIMITER //
+CREATE PROCEDURE get_comments_for_event(IN input_event_id INT)
+BEGIN
+    SELECT * FROM COMMENT WHERE EVENT_ID = input_event_id;
+END //
+
+DELIMITER ;
+
+
+
 
 -- //===============================================================================================//
 -- //                                PROCEDURES FOR ADDING ROLES                                    //
@@ -789,6 +834,8 @@ CALL find_all_events('0');
 
 
 CALL test_get_unapproved_events();
+
+CALL get_rso_admin_membership('0');
 
 -- CALL test_approve_event();
 

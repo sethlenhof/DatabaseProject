@@ -193,7 +193,67 @@ app.get("/api/users/events", (req, res) => {
 		return res.status(200).json({ events: response });
 	});
 });
+// *===========================================================*
+// |                	CREATE COMMENT API         			   |
+// *===========================================================*
+// Incoming: { userId, eventId, comment, rating }
+// Outgoing: { status }
+app.post("/api/events/comments/create", (req, res) => {
+	const { userId, eventId, comment, rating } = req.body;
+	if (!userId || !eventId || !comment || !rating) {
+		return res.status(400).json({ error: "missingFields" });
+	}
 
+	var data = sanitizeData({ userId, eventId, comment, rating });
+
+	const sql = "CALL insert_comment(?, ?, ?, ?)";
+	const params = [data.userId, data.eventId, data.comment, data.rating];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({});
+	});
+});
+
+
+// *===========================================================*
+// |                	GET COMMENTS FOR EVENT         		   |
+// *===========================================================*
+// Incoming: { eventId }
+// Outgoing: { status, comments }
+app.get("/api/events/comments", (req, res) => {
+	const { eventId } = req.query;
+	if (!eventId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ eventId });
+
+	const sql = "CALL get_comments_for_event(?)";
+	const params = [data.eventId];
+	db.query(sql, params, function (err, results) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({ comments: response });
+	});
+});
 
 // *===========================================================*
 // |                	GET RSO MEMBERSHIP API     			   |
