@@ -85,7 +85,7 @@ const ApproveEvents = () => {
                     <p>Location: {event.EVENT_LOCATION}</p>
                     <p>Starts: {event.EVENT_START}</p>
                     <p>Ends: {event.EVENT_END}</p>
-                    <Button onClick={() => handleApproveEvent(events.EVENT_ID)}>
+                    <Button onClick={() => handleApproveEvent(event.EVENT_ID, event.EVENT_NAME)}>
                         Approve
                     </Button>
                 </div>
