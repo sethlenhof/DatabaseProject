@@ -380,6 +380,37 @@ app.get("/api/events/unapproved", (req, res) => {
 	});
 });
 
+// *===========================================================*
+// |             APPROVE EVENT API     			               |
+// *===========================================================*
+// Incoming: { userId, eventId }
+// Outgoing: { status }
+app.post("/api/events/approve", (req, res) => {
+	const { userId, eventId } = req.body;
+	if (!userId || !eventId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId, eventId });
+
+	const sql = "CALL approve_event(?, ?)";
+	const params = [data.userId, data.eventId];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({});
+	});
+});
+
 // sanitizeData function to sanitize input data
 // prevent SQL injection
 function sanitizeData(data) {
