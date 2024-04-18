@@ -73,14 +73,14 @@ TO DO UPDATED:
   -[X] e. Create post endpoint to add event
   -[ ] f. Wire to front end, show toasts
 
-- [ ] 4. Get events
+- [X] 4. Get events
   -[X] a. Procedure to find all events for userId
     -[X] I. RSO events
     -[X] II. private (university) events
     -[X] III. public events
     -[X] IV. approved events
   -[X] b. GET Events endpoint
-  -[ ] c. populate onto the calendar and scrollable (wire together)
+  -[X] c. populate onto the calendar and scrollable (wire together)
 
 - [ ] 5. Event page
   -[X] a. Procedure to get all event data for event by eventId
