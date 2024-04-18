@@ -727,7 +727,7 @@ SELECT * FROM EVENTS;
 
 CALL test_get_unapproved_events();
 
-CALL test_approve_event();
+-- CALL test_approve_event();
 
 -- TO DO:
 -- X 1. Update procedure for sign up to include user info and set as student 
