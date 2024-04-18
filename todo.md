@@ -66,7 +66,7 @@ TO DO UPDATED:
   -[X] e. Wire to front end, show toast
 
 - [ ] 3. Create Events
-  -[ ] a. GET to determine RSO(S)
+  -[X] a. GET to determine RSO(S)
   -[ ] b. Add dropdown and adjust form as needed if multiple RSOs
   -[ ] c. Ensure form has all fields needed, adjust to match db
   -[X] d. Create procedure to add event given a USERID, RSO/UNI id
@@ -83,8 +83,8 @@ TO DO UPDATED:
   -[X] c. populate onto the calendar and scrollable (wire together)
 
 - [ ] 5. Event page
-  -[ ] a. Procedure to get all event data for event by eventId
-  -[ ] b. GET event_data endpoint
+  -[X] a. Procedure to get all event data for event by eventId
+  -[X] b. GET event_data endpoint
   -[ ] c. populate onto event page
     -[ ] i. show comments
     -[ ] ii. add comments
