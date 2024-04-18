@@ -66,7 +66,7 @@ TO DO UPDATED:
   -[X] e. Wire to front end, show toast
 
 - [ ] 3. Create Events
-  -[ ] a. GET to determine RSO(S)
+  -[X] a. GET to determine RSO(S)
   -[ ] b. Add dropdown and adjust form as needed if multiple RSOs
   -[ ] c. Ensure form has all fields needed, adjust to match db
   -[X] d. Create procedure to add event given a USERID, RSO/UNI id
