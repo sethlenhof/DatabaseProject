@@ -115,13 +115,13 @@ app.post("/api/users/signup", (req, res) => {
 // *===========================================================*
 // Incoming: { rsoId, universityId, name, category, description, startTime, endTime, location, contactPhone, contactEmail }
 // Outgoing: { status }
-// example api call: http://localhost:2363/api/events/create with body: (1, 1, 'UCF Event', 'Education', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+// example api call: http://localhost:2363/api/events/create with body: (1, 1, 'UCF Event', 'private', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 /* Body:
 {
 	"rsoId": 1,
 	"universityId": 1,
 	"name": "UCF Event",
-	"category": "Education",
+	"category": "private",
 	"description": "This is a test event",
 	"startTime": "2021-10-01 12:00:00",
 	"endTime": "2021-10-01 14:00:00",

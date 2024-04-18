@@ -232,6 +232,13 @@ BEGIN
     SELECT * FROM EVENTS WHERE UNIVERSITY_ID IS NULL AND RSO_ID IS NULL;
 END //
 
+-- find public events for user (where there is no RSO and no University)
+DELIMITER //
+CREATE PROCEDURE find_approved_events()
+BEGIN
+    -- select all events that are public and approved
+    SELECT * FROM APPROVED_EVENTS;
+END //
 
 -- find all events for user
 DELIMITER //
@@ -650,7 +657,7 @@ CALL testGetRSO();
 CALL testJoinRSO();
 
 -- insert event params: (p_rso_id INT, p_university_id INT, p_name VARCHAR(255), p_category VARCHAR(255), p_description TEXT, p_event_start VARCHAR(255), p_event_end VARCHAR(255), p_location VARCHAR(255), p_contact_phone VARCHAR(255), p_contact_email VARCHAR(255))
-CALL insert_event(1, 1, 'UCF Event', 'Education', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+CALL insert_event(1, 1, 'UCF Event', 'public', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 
 -- SELECT ALL EVENTS
 SELECT * FROM EVENTS;
