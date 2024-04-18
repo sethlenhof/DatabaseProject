@@ -205,6 +205,10 @@ BEGIN
 END //
 DELIMITER ;
 
+-- ||===================================================================================================||
+-- ||                                       PROCEDURES FOR EVENTS                                       ||
+-- ||===================================================================================================||
+
 -- Find RSO events for user
 DELIMITER //
 CREATE PROCEDURE find_RSO_events(IN input_user_id INT)

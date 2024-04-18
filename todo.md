@@ -79,7 +79,7 @@ TO DO UPDATED:
     -[X] II. private (university) events
     -[X] III. public events
     -[X] IV. approved events
-  -[ ] b. GET Events endpoint
+  -[X] b. GET Events endpoint
   -[ ] c. populate onto the calendar and scrollable (wire together)
 
 - [ ] 5. Event page
