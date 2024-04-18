@@ -310,6 +310,39 @@ END //
 
 DELIMITER ;
 
+-- ||===================================================================================================||
+-- ||                                       PROCEDURES FOR COMMENTS                                     ||
+-- ||===================================================================================================||
+-- create comment
+DELIMITER //
+CREATE PROCEDURE insert_comment(
+    IN p_event_id INT,
+    IN p_user_id CHAR(255),
+    IN p_comment TEXT,
+    IN p_rating INT
+)
+BEGIN
+    INSERT INTO COMMENT (EVENT_ID, USER_ID, COMMENT, RATING)
+    VALUES (p_event_id, p_user_id, p_comment, p_rating);
+
+    -- respond with success
+    SELECT 'Success: Comment created';
+END //
+
+DELIMITER ;
+
+-- get comments for event
+DELIMITER //
+CREATE PROCEDURE get_comments_for_event(IN input_event_id INT)
+BEGIN
+    SELECT * FROM COMMENT WHERE EVENT_ID = input_event_id;
+END //
+
+DELIMITER ;
+
+
+
+
 -- //===============================================================================================//
 -- //                                PROCEDURES FOR ADDING ROLES                                    //
 -- //===============================================================================================//
