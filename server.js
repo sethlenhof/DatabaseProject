@@ -194,6 +194,37 @@ app.post("/api/users/events", (req, res) => {
 	});
 });
 
+// *===========================================================*
+// |                	GET EVENT API           			   |
+// *===========================================================*
+// Incoming: { eventId }
+// Outgoing: { status, event }
+app.get("/api/events", (req, res) => {
+	const { eventId } = req.query;
+	if (!eventId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ eventId });
+
+	const sql = "CALL find_event_by_id(?)";
+	const params = [data.eventId];
+	db.query(sql, params, function (err, results) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({ event: response });
+	});
+});
+
+
 
 // *===========================================================*
 // |                	GET RSO MEMBERSHIP API     			   |

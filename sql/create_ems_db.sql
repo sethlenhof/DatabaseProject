@@ -209,6 +209,14 @@ DELIMITER ;
 -- ||                                       PROCEDURES FOR EVENTS                                       ||
 -- ||===================================================================================================||
 
+-- Find event data by ID
+DELIMITER //
+CREATE PROCEDURE find_event_by_id(IN input_event_id INT)
+BEGIN
+    -- select all events for the RSOs that the user is a part of
+    SELECT * FROM EVENTS WHERE EVENT_ID = input_event_id;
+END //
+
 -- Find RSO events for user
 DELIMITER //
 CREATE PROCEDURE find_RSO_events(IN input_user_id INT)
