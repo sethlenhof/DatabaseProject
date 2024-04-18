@@ -65,7 +65,7 @@ const EventViewScrollable = ({events}) => {
                     <p>Starts: {event.EVENT_START}</p>
                     <p>Ends: {event.EVENT_END}</p>
                     <Button onClick={() => handleGetDetails(event.EVENT_ID)}>
-                        Details
+                        View More
                     </Button>
                 </div>
             ))}
