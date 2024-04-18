@@ -227,7 +227,7 @@ app.get("/api/events/eventDetail", (req, res) => {
 
 
 // *===========================================================*
-// |                	GET RSO MEMBERSHIP API     			   |
+// |                	GET RSO ADMIN MEMBERSHIP API     	   |
 // *===========================================================*
 //Incoming: { userId }
 //Outgoing: { status, data }
@@ -240,7 +240,7 @@ app.post("/api/rso/admin", (req, res) => {
 	// Assuming 'sanitizeData' function is defined elsewhere to sanitize inputs
 	var data = sanitizeData({ userId });
 
-	const sql = "CALL get_rso_membership(?)";
+	const sql = "CALL get_rso_admin_membership(?)";
 	const params = [data.userId];
 	db.query(sql, params, function (err, result) {
 		// Handle SQL error

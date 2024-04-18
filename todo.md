@@ -83,8 +83,8 @@ TO DO UPDATED:
   -[ ] c. populate onto the calendar and scrollable (wire together)
 
 - [ ] 5. Event page
-  -[ ] a. Procedure to get all event data for event by eventId
-  -[ ] b. GET event_data endpoint
+  -[X] a. Procedure to get all event data for event by eventId
+  -[X] b. GET event_data endpoint
   -[ ] c. populate onto event page
     -[ ] i. show comments
     -[ ] ii. add comments

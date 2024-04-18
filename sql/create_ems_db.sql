@@ -802,6 +802,8 @@ CALL find_all_events('0');
 
 CALL test_get_unapproved_events();
 
+CALL get_rso_admin_membership('0');
+
 -- CALL test_approve_event();
 
 -- TO DO:
