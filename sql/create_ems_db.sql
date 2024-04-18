@@ -397,6 +397,21 @@ END //
 DELIMITER ;
 
 
+-- Procedure to get uni id 
+DELIMITER //
+CREATE PROCEDURE get_uni_id(IN input_user_id CHAR(255))
+BEGIN
+    SELECT UNIVERSITY_ID FROM USER_INFO WHERE USER_ID = input_user_id;
+END //
+DELIMITER ;
+
+-- Procedure to get uni id
+DELIMITER //
+CREATE PROCEDURE get_rso_id(IN input_user_id CHAR(255))
+BEGIN
+    SELECT RSO_ID FROM RSO_ADMIN WHERE USER_ID = input_user_id;
+END //
+DELIMITER ;
 
 -- PROCEDURE TO UPDATE UNIVERSITY INFO
 DELIMITER //

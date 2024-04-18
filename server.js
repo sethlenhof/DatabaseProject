@@ -111,6 +111,65 @@ app.post("/api/users/signup", (req, res) => {
 });
 
 // *===========================================================*
+// |                	GET USER UNI_ID API    			       |
+// *===========================================================*
+// Incoming: { useId }
+// Outgoing: { status, universityId }
+app.get("/api/university/id", (req, res) => {
+    const { userId } = req.query; // Assuming the userId is passed as a query parameter
+
+    if (!userId) {
+        return res.status(400).json({ error: "Missing userId parameter" });
+    }
+    const sql = "CALL get_uni_id(?)";
+    const params = [userId];
+    db.query(sql, params, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: "SQL error", details: err.message });
+        }
+        
+        const response = results[0][0]; // Assuming the procedure returns the result in the first index
+        if (response) {
+            return res.status(200).json({
+                universityId: response.UNIVERSITY_ID
+            });
+        } else {
+            return res.status(404).json({ error: "University ID not found" });
+        }
+    });
+});
+
+// *===========================================================*
+// |                	GET RSO ID API		    			   |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status, rsoId }
+app.get("/api/rso/id", (req, res) => {
+    const { userId } = req.query; // Assuming the userId is passed as a query parameter
+
+    if (!userId) {
+        return res.status(400).json({ error: "Missing userId parameter" });
+    }
+    const sql = "CALL get_rso_id(?)";
+    const params = [userId];
+    db.query(sql, params, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: "SQL error", details: err.message });
+        }
+        
+        const response = results[0][0]; // Assuming the procedure returns the result in the first index
+        if (response) {
+            return res.status(200).json({
+                rsoId: response.RSO_ID
+            });
+        } else {
+            return res.status(404).json({ error: "RSO ID not found" });
+        }
+    });
+});
+
+
+// *===========================================================*
 // |                	CREATE EVENT API           			   |
 // *===========================================================*
 // Incoming: { rsoId, universityId, name, category, description, startTime, endTime, location, contactPhone, contactEmail }
