@@ -289,8 +289,48 @@ END //
 
 DELIMITER ;
 
+-- //===============================================================================================//
+-- //                                PROCEDURES FOR ADDING ROLES                                    //
+-- //===============================================================================================//
 
+-- procedure to insert a student
+DELIMITER //
+CREATE PROCEDURE insert_student(
+    IN INSERT_USER_ID CHAR(255),
+    IN INSERT_RSO_ID INT
+)
+BEGIN
+    -- Check if the student already exists
+    DECLARE studentExists INT;
+    SELECT COUNT(*) INTO studentExists FROM STUDENT WHERE USER_ID = INSERT_USER_ID AND RSO_ID = INSERT_RSO_ID;
+    
+    -- Create a temporary table for response
+        CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+            RESPONSE_STATUS VARCHAR(20),
+            RESPONSE_MESSAGE VARCHAR(255)
+        );
 
+    IF studentExists > 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'Student already exists.');
+        ROLLBACK;
+    END IF;
+
+    -- Start the transaction
+    START TRANSACTION;
+
+    -- Insert the student into the STUDENT table
+    INSERT INTO STUDENT (USER_ID, RSO_ID) VALUES (INSERT_USER_ID, INSERT_RSO_ID);
+
+    -- Commit the transaction
+    COMMIT;
+
+    -- Insert success message into the RESPONSE table
+    INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'Student added successfully.');
+
+    -- Return the response
+    SELECT * FROM RESPONSE;
+    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
+END //
 
 -- procedure to insert a super admin
 DELIMITER //
@@ -630,14 +670,18 @@ CALL insert_super_admin('admin@ucf.edu', 'James D. Taiclet', 'Password1!', 'Univ
 
 -- INSERT INTO UNIVERSITY (UNIVERSITY_NAME, UNIVERSITY_LOCATION, UNIVERSITY_EMAIL, UNIVERSITY_ID) VALUES ('University of Central Florida', 'Orlando, FL', 'ucf.edu', 1);
 
-CALL insert_user_login('test@ucf.edu', 'Password1!');
+-- CALL insert_user_login('test@ucf.edu', 'Password1!');
 CALL insert_user_login('rso@ucf.edu', 'Password1!');
--- CALL insert_user_login('admin@ucf.edu', 'Password1!');
+CALL insert_user_login('admin@ucf.edu', 'Password1!');
 CALL insert_user_login('guy3@ucf.edu', 'Password1!');
--- CALL validate_user('admin@ucf.edu', 'Password1!');
+CALL validate_user('admin@ucf.edu', 'Password1!');
 
-CALL insert_user_login('test@ucf.edu', 'Password1!');
+-- manually insert test user
+INSERT INTO USER_LOGIN (USER_ID, EMAIL, PASS) VALUES ('0', 'test@ucf.edu', SHA2('Password1!', 256));
+INSERT INTO USER_INFO (USER_ID, USERS_NAME, UNIVERSITY_ID) VALUES ('0', 'Test User', 1);
+
 CALL validate_user('test@ucf.edu', 'Password1!');
+
 
 
 SELECT * FROM SUPER_ADMIN;
@@ -649,6 +693,7 @@ CALL testUpdateUniversity();
 -- call procedure to test the rso creation
 -- call procedure to test the rso creation
 CALL testRSO();
+CALL testRSO();
 
 -- call procedure to test the rso creation
 CALL testGetRSO();
@@ -656,11 +701,28 @@ CALL testGetRSO();
 -- call procedure to test the rso creation
 CALL testJoinRSO();
 
--- insert event params: (p_rso_id INT, p_university_id INT, p_name VARCHAR(255), p_category VARCHAR(255), p_description TEXT, p_event_start VARCHAR(255), p_event_end VARCHAR(255), p_location VARCHAR(255), p_contact_phone VARCHAR(255), p_contact_email VARCHAR(255))
-CALL insert_event(1, 1, 'UCF Event', 'public', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
 
--- SELECT ALL EVENTS
-SELECT * FROM EVENTS;
+-- RSO events
+-- insert event params: (p_rso_id INT, p_university_id INT, p_name VARCHAR(255), p_category VARCHAR(255), p_description TEXT, p_event_start VARCHAR(255), p_event_end VARCHAR(255), p_location VARCHAR(255), p_contact_phone VARCHAR(255), p_contact_email VARCHAR(255))
+CALL insert_event(1, 1, 'UCF Event', 'Educational', 'This is a test event', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+-- test RSO event (SHOULD NOT BE ABLE TO SEE FROM STUDENT)
+CALL insert_event(2, 1, 'UCF Event', 'Yippee!', 'This event shouldnt be visible', '2021-10-01 12:00:00', '2021-10-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+
+-- Private event
+CALL insert_event(NULL, 1, 'UCF Event', 'Educational', 'This is a test event', '2021-11-01 12:00:00', '2021-11-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+-- Public event
+CALL insert_event(NULL, NULL, 'UCF Event', 'Educational', 'This is a test event', '2021-12-01 12:00:00', '2021-12-01 14:00:00', 'UCF Student Union', '407-123-4567', 'test@email.com');
+
+
+-- add test student to RSO
+CALL insert_student('0', 1);
+
+-- test get event
+CALL find_all_events('0');
+
 
 -- TO DO:
 -- X 1. Update procedure for sign up to include user info and set as student 

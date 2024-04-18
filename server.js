@@ -133,7 +133,7 @@ app.post("/api/users/signup", (req, res) => {
 app.post("/api/events/create", (req, res) => {
 	// create const based on incoming
 	const { rsoId, universityId, name, category, description, startTime, endTime, location, contactPhone, contactEmail } = req.body;
-	if (!rsoId || !universityId || !name || !category || !description || !startTime || !endTime || !location || !contactPhone || !contactEmail) {
+	if ( !name || !category || !description || !startTime || !endTime || !location || !contactPhone || !contactEmail) {
 		return res.status(400).json({ error: "missingFields" });
 	}
 
@@ -159,6 +159,37 @@ app.post("/api/events/create", (req, res) => {
 			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
 		}
 		return res.status(200).json({Success: "Successfully created event"});
+	});
+});
+
+// *===========================================================*
+// |                	GET EVENTS API           			   |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status, events }
+
+app.get("/api/users/events", (req, res) => {
+	const { userId } = req.query;
+	if (!userId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId });
+
+	const sql = "CALL find_all_events(?)";
+	const params = [data.userId];
+	db.query(sql, params, function (err, results) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({ events: response });
 	});
 });
 
