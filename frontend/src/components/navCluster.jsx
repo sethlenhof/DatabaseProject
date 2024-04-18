@@ -4,6 +4,7 @@ import EventForm from './eventForm.jsx';
 import CreateRso from './createRsoForm.jsx';
 import UniversityProfileForm from './universityForm.jsx';
 import JoinRSO from './joinRSO.jsx';
+import ApproveEvents from './approveEvents.jsx';
 
 const NavCluster = ({ user }) => {
     const [modalContent, setModalContent] = useState('');
@@ -52,7 +53,7 @@ const NavCluster = ({ user }) => {
             case 'university':
                 return <UniversityProfileForm />;
             case 'approveEvents':
-                return <h1>Approve Events Form</h1>;
+                return <ApproveEvents />;
             case 'join-rso':
                 return <h1><JoinRSO /></h1>;
             default:
