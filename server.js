@@ -382,6 +382,67 @@ app.post("/api/rso/join", (req, res) => {
 	});
 });
 
+// *===========================================================*
+// |             GET UNNAPROVED EVENTS API     			       |
+// *===========================================================*
+// Incoming: { userId }
+// Outgoing: { status, events }
+app.get("/api/events/unapproved", (req, res) => {
+	const { userId } = req.query;
+	if (!userId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId });
+
+	const sql = "CALL get_unapproved_events(?)";
+	const params = [data.userId];
+	db.query(sql, params, function (err, results) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({ events: response });
+	});
+});
+
+// *===========================================================*
+// |             APPROVE EVENT API     			               |
+// *===========================================================*
+// Incoming: { userId, eventId }
+// Outgoing: { status }
+app.post("/api/events/approve", (req, res) => {
+	const { userId, eventId } = req.body;
+	if (!userId || !eventId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ userId, eventId });
+
+	const sql = "CALL approve_event(?, ?)";
+	const params = [data.userId, data.eventId];
+	db.query(sql, params, function (err, result) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		//extract the response from the stored procedure
+		const response = result[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({});
+	});
+});
+
 // sanitizeData function to sanitize input data
 // prevent SQL injection
 function sanitizeData(data) {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Button from './button';
 
-const JoinRSO = () => {
-    const [rsos, setRsos] = useState([]);
+const ApproveEvents = () => {
+    const [events, setEvents] = useState([]);
     const userId = localStorage.getItem('user');
 
     if(!userId) {
@@ -12,20 +12,26 @@ const JoinRSO = () => {
 
     useEffect(() => {
         if (userId) {
-            fetch(`/api/rsos?userId=${userId}`)
+            fetch(`/api/events/unapproved?userId=${userId}`)
                 .then(response => response.json())
-                .then(data => setRsos(data.rsos))
-                .catch(error => console.error('Error fetching RSO data:', error));
+                .then(data => {
+                    if (data.error) {
+                        window.showToast({title: "Error", message: data.error, type: "error", autoHide: true});
+                    } else{
+                        setEvents(data.events)
+                    }
+                }
+            ).catch(error => console.error('Error fetching Unnapproved data:', error));
         }
      }, [userId]);
 
-    const handleJoinRSO = (rsoId, rsoName) => {
-        fetch('/api/rso/join', {
+    const handleApproveEvent = (eventId, eventName) => {
+        fetch('/api/events/approve', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ userId, rsoId }) // Sending both userId and rsoId
+            body: JSON.stringify({ userId, eventId }) // Sending both userId and rsoId
         })
         .then(response => response.json())
         .then(data => {
@@ -33,10 +39,9 @@ const JoinRSO = () => {
                 window.showToast({title: "Error", message: data.error, type: "error", autoHide: true});
 
             } else {
-                window.showToast({title: "Success", message: `Joined RSO ${rsoName}`, type: "success", autoHide: true});
+                window.showToast({title: "Success", message: `Approved Event ${eventName}`, type: "success", autoHide: true});
             }
         })
-        .catch(error => console.error('Error joining RSO:', error));
     };
 
     const headerStyle = {
@@ -64,21 +69,24 @@ const JoinRSO = () => {
             minWidth: "300px",
             width: '60vw',
             margin: 'auto' }}>
-            <h1 style={headerStyle}>Join Registered Student Organizations</h1>
-            {rsos.map(rso => (
-                <div key={rso.RSO_ID} style={{
+            <h1 style={headerStyle}>Unnapproved Events</h1>
+            {events.map(event => (
+                <div key={event.EVENT_ID} style={{
                     padding: '10px',
                     margin: '10px',
                     borderRadius: '5px',
                     border: '1px solid',
-                    borderColor: rso.COLOR,
+                    borderColor: 'blueviolet',
                     fontSize: '16px',
                     width: '100%'
                 }}>
-                    <h4>{rso.RSO_NAME}</h4>
-                    <p>{rso.RSO_DESCRIPTION}</p>
-                    <Button onClick={() => handleJoinRSO(rso.RSO_ID, rso.RSO_NAME)}>
-                        Join
+                    <h4>{event.EVENT_NAME}</h4>
+                    <p>{event.EVENT_DESCRIPTION}</p>
+                    <p>Location: {event.EVENT_LOCATION}</p>
+                    <p>Starts: {event.EVENT_START}</p>
+                    <p>Ends: {event.EVENT_END}</p>
+                    <Button onClick={() => handleApproveEvent(event.EVENT_ID, event.EVENT_NAME)}>
+                        Approve
                     </Button>
                 </div>
             ))}
@@ -86,4 +94,4 @@ const JoinRSO = () => {
     );
 };
 
-export default JoinRSO;
+export default ApproveEvents;
