@@ -13,6 +13,7 @@ export default class Dashboard extends React.Component {
             isLoading: true,
             userId: localStorage.getItem("user"),
             events: [],
+            calendarEvents: [],
             // Define your events array
             // events: [
             //     // ways to format the data
@@ -55,11 +56,25 @@ export default class Dashboard extends React.Component {
                 if (data.error) {
                     console.error('Error getting events', data.error);
                 } else {
-                    this.setState({ events: data.events, isLoading: false});
+                    const formattedEvents = data.events.map(event => ({
+                        title: event.EVENT_NAME,
+                        start: event.EVENT_START,
+                        end: event.EVENT_END,
+                        color: '#ff9f89' // Customize this color as needed
+                    }));
+                    console.log('Formatted events:', formattedEvents);
+                    this.setState({ 
+                        events: data.events, 
+                        calendarEvents: formattedEvents, 
+                        isLoading: false
+                    });
                 }
-            }).catch(error => console.error('Error getting events', error));
+            }).catch(error => {
+                console.error('Error getting events', error);
+                this.setState({ isLoading: false });
+            });
     };
-
+    
     render() {
         if (this.state.isLoading) {
             return <div>Loading...</div>;
@@ -85,7 +100,7 @@ export default class Dashboard extends React.Component {
                 }}>
                     <div style={{ width: '45%' }}>
                         <h1 style={{ textAlign: 'center' }}>Calendar</h1>
-                        <MyCalendar events={this.state.events}/>
+                        <MyCalendar events={this.state.calendarEvents}/>
                     </div>
                     <div style={{ width: '45%' }}>
                         <h1 style={{ textAlign: 'center' }}>Upcoming Events</h1>

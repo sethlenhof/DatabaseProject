@@ -193,6 +193,37 @@ app.get("/api/users/events", (req, res) => {
 		return res.status(200).json({ events: response });
 	});
 });
+
+// *===========================================================*
+// |                	GET EVENT API           			   |
+// *===========================================================*
+// Incoming: { eventId }
+// Outgoing: { status, event }
+app.get("/api/events/eventDetail", (req, res) => {
+	const { eventId } = req.query;
+	if (!eventId) {
+		return res.status(400).json({ error: "missingFields" });
+	}
+
+	var data = sanitizeData({ eventId });
+
+	const sql = "CALL find_event_by_id(?)";
+	const params = [data.eventId];
+	db.query(sql, params, function (err, results) {
+		// Handle SQL error
+		if (err) {
+			return res.status(400).json({ error: "sqlError" });
+		}
+
+		const response = results[0][0];
+
+		if (response.RESPONSE_STATUS === "Error") {
+			return res.status(400).json({ error: response.RESPONSE_MESSAGE });
+		}
+		return res.status(200).json({ event: response });
+	});
+});
+
 // *===========================================================*
 // |                	CREATE COMMENT API         			   |
 // *===========================================================*
@@ -256,7 +287,7 @@ app.get("/api/events/comments", (req, res) => {
 });
 
 // *===========================================================*
-// |                	GET RSO MEMBERSHIP API     			   |
+// |                	GET RSO ADMIN MEMBERSHIP API     	   |
 // *===========================================================*
 //Incoming: { userId }
 //Outgoing: { status, data }
@@ -269,7 +300,7 @@ app.post("/api/rso/admin", (req, res) => {
 	// Assuming 'sanitizeData' function is defined elsewhere to sanitize inputs
 	var data = sanitizeData({ userId });
 
-	const sql = "CALL get_rso_membership(?)";
+	const sql = "CALL get_rso_admin_membership(?)";
 	const params = [data.userId];
 	db.query(sql, params, function (err, result) {
 		// Handle SQL error
