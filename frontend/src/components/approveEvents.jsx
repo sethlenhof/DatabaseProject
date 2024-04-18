@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from './button';
 
 const ApproveEvents = () => {
-    const [rsos, setRsos] = useState([]);
+    const [events, setEvents] = useState([]);
     const userId = localStorage.getItem('user');
 
     if(!userId) {
@@ -18,7 +18,7 @@ const ApproveEvents = () => {
                     if (data.error) {
                         window.showToast({title: "Error", message: data.error, type: "error", autoHide: true});
                     } else{
-                        setRsos(data.rsos)
+                        setEvents(data.events)
                     }
                 }
             ).catch(error => console.error('Error fetching Unnapproved data:', error));
@@ -69,21 +69,24 @@ const ApproveEvents = () => {
             minWidth: "300px",
             width: '60vw',
             margin: 'auto' }}>
-            <h1 style={headerStyle}>Join Registered Student Organizations</h1>
-            {rsos.map(events => (
-                <div key={events.RSO_ID} style={{
+            <h1 style={headerStyle}>Unnapproved Events</h1>
+            {events.map(event => (
+                <div key={event.EVENT_ID} style={{
                     padding: '10px',
                     margin: '10px',
                     borderRadius: '5px',
                     border: '1px solid',
-                    borderColor: rso.COLOR,
+                    borderColor: 'blueviolet',
                     fontSize: '16px',
                     width: '100%'
                 }}>
-                    <h4>{rso.RSO_NAME}</h4>
-                    <p>{rso.RSO_DESCRIPTION}</p>
-                    <Button onClick={() => handleApproveEvent(events.Id)}>
-                        Join
+                    <h4>{event.EVENT_NAME}</h4>
+                    <p>{event.EVENT_DESCRIPTION}</p>
+                    <p>Location: {event.EVENT_LOCATION}</p>
+                    <p>Starts: {event.EVENT_START}</p>
+                    <p>Ends: {event.EVENT_END}</p>
+                    <Button onClick={() => handleApproveEvent(events.EVENT_ID)}>
+                        Approve
                     </Button>
                 </div>
             ))}
