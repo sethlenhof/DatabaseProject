@@ -38,28 +38,53 @@ DROP PROCEDURE IF EXISTS approve_event;
 
 -- Procedure to approve an event
 DELIMITER //
+
 CREATE PROCEDURE approve_event(IN input_super_admin_id CHAR(255), IN input_event_id INT)
 BEGIN
     DECLARE uni_id INT;
     DECLARE event_uni_id INT;
+    DECLARE already_approved INT;
+
+    -- Create response table
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
     -- Get the university ID associated with the super admin
     SELECT UNIVERSITY_ID INTO uni_id FROM SUPER_ADMIN WHERE USER_ID = input_super_admin_id;
 
     -- Get the university ID associated with the event
     SELECT UNIVERSITY_ID INTO event_uni_id FROM EVENTS WHERE EVENT_ID = input_event_id;
 
-    -- Ensure the event and the super admin are from the same university
-    IF uni_id = event_uni_id THEN
-        -- Insert the approval record into APPROVED_EVENTS
-        INSERT INTO APPROVED_EVENTS (EVENT_ID, SUPER_ADMIN_ID)
-        VALUES (input_event_id, input_super_admin_id);
+    -- Check if the event is already approved
+    SELECT COUNT(*) INTO already_approved FROM APPROVED_EVENTS WHERE EVENT_ID = input_event_id;
 
-        SELECT 'Success' AS Status, 'Event approved successfully.' AS Message;
+    -- Check if the event is already approved
+    IF already_approved > 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'Cannot approve the event: It is already approved.');
     ELSE
-        SELECT 'Error' AS Status, 'Event cannot be approved by this super admin, mismatch in university IDs.' AS Message;
+        -- Ensure the event and the super admin are from the same university
+        IF uni_id = event_uni_id THEN
+            -- Insert the approval record into APPROVED_EVENTS
+            INSERT INTO APPROVED_EVENTS (EVENT_ID, SUPER_ADMIN_ID)
+            VALUES (input_event_id, input_super_admin_id);
+
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'Event approved successfully.');
+        ELSE
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'Error approving event. Super admin and event are not from the same university.');
+        END IF;
     END IF;
+
+    -- Select all responses to return to the caller
+    SELECT * FROM RESPONSE;
+
+    -- Cleanup: drop the temporary table
+    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
 END //
+
 DELIMITER ;
+
 
 
 DROP PROCEDURE IF EXISTS test_approve_event;
