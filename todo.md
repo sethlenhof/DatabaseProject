@@ -96,6 +96,12 @@ TO DO UPDATED:
   -[ ] d. POST to approve the event
   -[ ] e. Wire to front end, show toast
 
+THINGS WE CAN "WORK ON":
+- [ ] 1. Constraints
+  - [ ] a. new events being held at the same location and time
+  - [ ] b. admins of other RSOs trying to create an event for another RSO (weird?)
+  - [ ] c. inserting a member of an RSO with 4 members changing to active (ig. they can make one but not have 4 and it be "inactive"?)
+  - [ ] d. a delete of an RSO with 5 members "show the status of the RSO changing to inactive"
 
 IDK IF WE NEED:
 - [ ] 1. User Profile page to update info
