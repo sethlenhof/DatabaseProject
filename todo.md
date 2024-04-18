@@ -55,7 +55,7 @@ TO DO UPDATED:
   -[X] a. update the form if needed
   -[x] b. update the procedure
   -[X] c. create the endpoint to create an RSO
-  -[ ] d. validate that there are 4 emails and the users exist
+  -[O] d. validate that there are 4 emails and the users exist
   -[X] e. wire together with api
 
 - [X] 2. Join RSOs
@@ -74,7 +74,11 @@ TO DO UPDATED:
   -[ ] f. Wire to front end, show toasts
 
 - [ ] 4. Get events
-  -[ ] a. Procedure to find all events for userId
+  -[X] a. Procedure to find all events for userId
+    -[X] I. RSO events
+    -[X] II. private (university) events
+    -[X] III. public events
+    -[X] IV. approved events
   -[ ] b. GET Events endpoint
   -[ ] c. populate onto the calendar and scrollable (wire together)
 

@@ -247,7 +247,7 @@ BEGIN
     -- select all events for the user, calling other procedures
     CALL find_RSO_events(input_user_id);
     CALL find_private_events(input_user_id);
-    CALL find_public_events();
+    CALL find_approved_events();
 END //
 DELIMITER ;
 
