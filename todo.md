@@ -89,12 +89,12 @@ TO DO UPDATED:
     -[ ] i. show comments
     -[ ] ii. add comments
 
-- [ ] 6. Approve Events
-  -[ ] a. GET Unnaproved_events endpoint
-  -[ ] b. populate onto a modal
-  -[ ] c. Approve buttons next to each event
-  -[ ] d. POST to approve the event
-  -[ ] e. Wire to front end, show toast
+- [X] 6. Approve Events
+  -[X] a. GET Unnaproved_events endpoint
+  -[X] b. populate onto a modal
+  -[X] c. Approve buttons next to each event
+  -[X] d. POST to approve the event
+  -[X] e. Wire to front end, show toast
 
 THINGS WE CAN "WORK ON":
 - [ ] 1. Constraints

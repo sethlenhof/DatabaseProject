@@ -302,44 +302,48 @@ DELIMITER ;
 -- //                                PROCEDURES FOR ADDING ROLES                                    //
 -- //===============================================================================================//
 
--- procedure to insert a student
+-- procedure to join RSO
 DELIMITER //
-CREATE PROCEDURE insert_student(
-    IN INSERT_USER_ID CHAR(255),
-    IN INSERT_RSO_ID INT
+
+CREATE PROCEDURE join_rso(
+    IN input_user_id CHAR(255),
+    IN input_rso_id INT
 )
 BEGIN
-    -- Check if the student already exists
-    DECLARE studentExists INT;
-    SELECT COUNT(*) INTO studentExists FROM STUDENT WHERE USER_ID = INSERT_USER_ID AND RSO_ID = INSERT_RSO_ID;
-    
-    -- Create a temporary table for response
-        CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
-            RESPONSE_STATUS VARCHAR(20),
-            RESPONSE_MESSAGE VARCHAR(255)
-        );
+    DECLARE is_member INT DEFAULT 0;
+    DECLARE user_exists INT DEFAULT 0;
+    DECLARE rso_exists INT DEFAULT 0;
 
-    IF studentExists > 0 THEN
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'Student already exists.');
-        ROLLBACK;
+    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
+        RESPONSE_STATUS VARCHAR(20),
+        RESPONSE_MESSAGE VARCHAR(255)
+    );
+
+    -- Check if the user and RSO exist
+    SELECT COUNT(*) INTO user_exists FROM USER_INFO WHERE USER_ID = input_user_id;
+    SELECT COUNT(*) INTO rso_exists FROM RSO WHERE RSO_ID = input_rso_id;
+
+    IF user_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'User does not exist.');
+    ELSEIF rso_exists = 0 THEN
+        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'RSO does not exist.');
+    ELSE
+        -- Check if the user is already a member of this RSO
+        SELECT COUNT(*) INTO is_member FROM STUDENT WHERE USER_ID = input_user_id AND RSO_ID = input_rso_id;
+
+        -- If the user is not already a member, insert the new record
+        IF is_member = 0 THEN
+            INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES (input_rso_id, input_user_id);
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'You have successfully joined the RSO.');
+        ELSE
+            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'You are already a member of this RSO.');
+        END IF;
     END IF;
 
-    -- Start the transaction
-    START TRANSACTION;
-
-    -- Insert the student into the STUDENT table
-    INSERT INTO STUDENT (USER_ID, RSO_ID) VALUES (INSERT_USER_ID, INSERT_RSO_ID);
-
-    -- Commit the transaction
-    COMMIT;
-
-    -- Insert success message into the RESPONSE table
-    INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'Student added successfully.');
-
-    -- Return the response
     SELECT * FROM RESPONSE;
     DROP TEMPORARY TABLE IF EXISTS RESPONSE;
 END //
+DELIMITER ;
 
 -- procedure to insert a super admin
 DELIMITER //
@@ -617,50 +621,6 @@ END //
 DELIMITER ;
 
 
--- procedure to join RSO
-DELIMITER //
-
-CREATE PROCEDURE join_rso(
-    IN input_user_id CHAR(255),
-    IN input_rso_id INT
-)
-BEGIN
-    DECLARE is_member INT DEFAULT 0;
-    DECLARE user_exists INT DEFAULT 0;
-    DECLARE rso_exists INT DEFAULT 0;
-
-    CREATE TEMPORARY TABLE IF NOT EXISTS RESPONSE (
-        RESPONSE_STATUS VARCHAR(20),
-        RESPONSE_MESSAGE VARCHAR(255)
-    );
-
-    -- Check if the user and RSO exist
-    SELECT COUNT(*) INTO user_exists FROM USER_INFO WHERE USER_ID = input_user_id;
-    SELECT COUNT(*) INTO rso_exists FROM RSO WHERE RSO_ID = input_rso_id;
-
-    IF user_exists = 0 THEN
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'User does not exist.');
-    ELSEIF rso_exists = 0 THEN
-        INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'RSO does not exist.');
-    ELSE
-        -- Check if the user is already a member of this RSO
-        SELECT COUNT(*) INTO is_member FROM STUDENT WHERE USER_ID = input_user_id AND RSO_ID = input_rso_id;
-
-        -- If the user is not already a member, insert the new record
-        IF is_member = 0 THEN
-            INSERT INTO STUDENT (RSO_ID, USER_ID) VALUES (input_rso_id, input_user_id);
-            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Success', 'You have successfully joined the RSO.');
-        ELSE
-            INSERT INTO RESPONSE (RESPONSE_STATUS, RESPONSE_MESSAGE) VALUES ('Error', 'You are already a member of this RSO.');
-        END IF;
-    END IF;
-
-    SELECT * FROM RESPONSE;
-    DROP TEMPORARY TABLE IF EXISTS RESPONSE;
-END //
-
-DELIMITER ;
-
 -- test procedure to join RSO
 DELIMITER //
 CREATE PROCEDURE testJoinRSO()
@@ -702,7 +662,6 @@ CALL testUpdateUniversity();
 -- call procedure to test the rso creation
 -- call procedure to test the rso creation
 CALL testRSO();
-CALL testRSO();
 
 -- call procedure to test the rso creation
 CALL testGetRSO();
@@ -727,7 +686,7 @@ CALL insert_event(NULL, NULL, 'UCF Event', 'Educational', 'This is a test event'
 
 
 -- add test student to RSO
-CALL insert_student('0', 1);
+CALL join_rso('0', 1);
 
 -- test get event
 CALL find_all_events('0');
