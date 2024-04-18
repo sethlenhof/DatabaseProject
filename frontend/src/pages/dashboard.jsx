@@ -1,7 +1,7 @@
 import React from 'react';
 import MyCalendar from '../components/calendar';
 import NavCluster from '../components/navCluster';
-import ListView from '../components/listView';
+import EventViewScrollable from '../components/eventViewScollable';
 
 export default class Dashboard extends React.Component {
     constructor(props) {
@@ -12,19 +12,20 @@ export default class Dashboard extends React.Component {
             userType: '',
             isLoading: true,
             userId: localStorage.getItem("user"),
-
+            events: [],
             // Define your events array
-            events: [
-                // ways to format the data
-                {title: 'Goon', start: '2024-04-10T10:00:00', end: '2024-04-10T12:00:00', color: '#ff9f89'},
-                {title: 'test day', date: '2024-04-13', color: '#ff9f89'},
-            ]
+            // events: [
+            //     // ways to format the data
+            //     {title: 'Goon', start: '2024-04-10T10:00:00', end: '2024-04-10T12:00:00', color: '#ff9f89'},
+            //     {title: 'test day', date: '2024-04-13', color: '#ff9f89'},
+            // ]
         };
     }
 
     componentDidMount() {
         console.log("component did mount")
         this.fetchUserType();
+        this.getEvents();
     }
   
     //fetch userType
@@ -47,6 +48,18 @@ export default class Dashboard extends React.Component {
         });
     }
 
+    getEvents = () => {
+        fetch(`/api/users/events?userId=${this.state.userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error getting events', data.error);
+                } else {
+                    this.setState({ events: data.events, isLoading: false});
+                }
+            }).catch(error => console.error('Error getting events', error));
+    };
+
     render() {
         if (this.state.isLoading) {
             return <div>Loading...</div>;
@@ -62,7 +75,7 @@ export default class Dashboard extends React.Component {
                 <div style={{
                         textAlign: 'center',
                     }}>
-                        <h1>Welcome, USERNAME</h1>
+                        <h1>Welcome, USERNAME</h1>  {/* Consider adding username handling if needed */}
                 </div>
                 <div style={{
                     display: 'flex',
@@ -72,14 +85,15 @@ export default class Dashboard extends React.Component {
                 }}>
                     <div style={{ width: '45%' }}>
                         <h1 style={{ textAlign: 'center' }}>Calendar</h1>
-                        <MyCalendar events={this.events}/>
+                        <MyCalendar events={this.state.events}/>
                     </div>
                     <div style={{ width: '45%' }}>
                         <h1 style={{ textAlign: 'center' }}>Upcoming Events</h1>
-                        <ListView events={this.events} />
+                        <EventViewScrollable events={this.state.events} />
                     </div>
                 </div>
             </div>
         );
     }
+    
 }
